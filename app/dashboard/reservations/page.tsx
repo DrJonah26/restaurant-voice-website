@@ -34,7 +34,12 @@ export default function ReservationsPage() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [pageSize, setPageSize] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
+  const [isHydrated, setIsHydrated] = useState(false)
   const supabase = createClient()
+
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
 
   useEffect(() => {
     const loadData = async () => {
@@ -193,38 +198,53 @@ export default function ReservationsPage() {
                 className="pl-9"
               />
             </div>
-            <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Zeitraum" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle</SelectItem>
-                <SelectItem value="today">Heute</SelectItem>
-                <SelectItem value="week">Diese Woche</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Status</SelectItem>
-                <SelectItem value="confirmed">Bestätigt</SelectItem>
-                <SelectItem value="cancelled">Abgesagt</SelectItem>
-                <SelectItem value="completed">Abgeschlossen</SelectItem>
-                <SelectItem value="no_show">Nicht erschienen</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={pageSize.toString()} onValueChange={(v) => setPageSize(Number(v))}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10 pro Seite</SelectItem>
-                <SelectItem value="25">25 pro Seite</SelectItem>
-                <SelectItem value="50">50 pro Seite</SelectItem>
-              </SelectContent>
-            </Select>
+            {isHydrated ? (
+              <Select value={dateFilter} onValueChange={setDateFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Zeitraum" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle</SelectItem>
+                  <SelectItem value="today">Heute</SelectItem>
+                  <SelectItem value="week">Diese Woche</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="h-10 w-full rounded-md border border-input bg-background" />
+            )}
+            {isHydrated ? (
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Alle Status</SelectItem>
+                  <SelectItem value="confirmed">Bestätigt</SelectItem>
+                  <SelectItem value="cancelled">Abgesagt</SelectItem>
+                  <SelectItem value="completed">Abgeschlossen</SelectItem>
+                  <SelectItem value="no_show">Nicht erschienen</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="h-10 w-full rounded-md border border-input bg-background" />
+            )}
+            {isHydrated ? (
+              <Select
+                value={pageSize.toString()}
+                onValueChange={(v) => setPageSize(Number(v))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10 pro Seite</SelectItem>
+                  <SelectItem value="25">25 pro Seite</SelectItem>
+                  <SelectItem value="50">50 pro Seite</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="h-10 w-full rounded-md border border-input bg-background" />
+            )}
           </div>
         </CardContent>
       </Card>

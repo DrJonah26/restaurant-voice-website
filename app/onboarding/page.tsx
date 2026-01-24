@@ -31,6 +31,7 @@ export default function OnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [provisioningNumber, setProvisioningNumber] = useState(false)
   const supabase = createClient()
 
   // ⬇️ HIER
@@ -102,7 +103,7 @@ export default function OnboardingPage() {
       }
 
       // Save restaurant data to Supabase
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("practices")
         .upsert(
           {
@@ -114,12 +115,38 @@ export default function OnboardingPage() {
             closing_time: closingTime,
             max_capacity: maxCapacity[0],
             closed_days: closedDays,
-            onboarding_completed: true,
+            onboarding_completed: false,
           },
           { onConflict: "user_id" }
         )
+        .select("id")
+        .single()
 
-      if (error) throw error
+      if (error || !data?.id) throw error ?? new Error("Practice-ID fehlt")
+
+      setProvisioningNumber(true)
+      const response = await fetch("/api/provision-number", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          practiceId: data.id,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || "Fehler beim Einrichten der Telefonnummer")
+      }
+
+      const { error: completionError } = await supabase
+        .from("practices")
+        .update({ onboarding_completed: true })
+        .eq("user_id", user.id)
+
+      if (completionError) throw completionError
 
       // Trigger confetti
       if (typeof window !== "undefined") {
@@ -130,13 +157,14 @@ export default function OnboardingPage() {
         })
       }
 
-      toast.success("Onboarding abgeschlossen!")
+      toast.success(`Onboarding abgeschlossen! Nummer: ${result.phoneNumber}`)
       setTimeout(() => {
         router.push("/dashboard")
       }, 1500)
     } catch (error: any) {
       toast.error(error.message || "Fehler beim Speichern")
       setLoading(false)
+      setProvisioningNumber(false)
     }
   }
 
@@ -220,7 +248,7 @@ export default function OnboardingPage() {
                       type="tel"
                       value={restaurantPhone}
                       onChange={(e) => setRestaurantPhone(e.target.value)}
-                      placeholder="+49 123 456789"
+                      placeholder="+44 20 1234 5678"
                     />
                   </div>
                 </div>
@@ -378,7 +406,11 @@ export default function OnboardingPage() {
                     Zurück
                   </Button>
                   <Button onClick={handleFinish} className="flex-1" disabled={loading}>
-                    {loading ? "Wird gespeichert..." : "Dashboard öffnen"}
+                    {loading
+                      ? provisioningNumber
+                        ? "📞 Telefonnummer wird eingerichtet..."
+                        : "Wird gespeichert..."
+                      : "Dashboard öffnen"}
                   </Button>
                 </div>
               </motion.div>

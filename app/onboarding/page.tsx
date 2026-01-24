@@ -138,7 +138,7 @@ export default function OnboardingPage() {
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || "Fehler beim Einrichten der Telefonnummer")
+        throw new Error(result.details || result.error || "Fehler beim Einrichten der Telefonnummer")
       }
 
       const { error: completionError } = await supabase

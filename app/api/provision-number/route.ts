@@ -15,6 +15,7 @@ const twilioClient = twilio(
 )
 
 const VOICE_AGENT_URL = process.env.VOICE_AGENT_URL
+const IS_DEV_MODE = process.env.NODE_ENV === "development" || process.env.TWILIO_DEV_MODE === "true"
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,6 +67,30 @@ export async function POST(request: NextRequest) {
         success: true,
         phoneNumber: practice.twilio_number,
         message: "Number already exists",
+      })
+    }
+
+    if (IS_DEV_MODE) {
+      const fakeNumber = `+4477009${Math.floor(100000 + Math.random() * 900000)}`
+      const { error: updateError } = await supabase
+        .from("practices")
+        .update({
+          twilio_number: fakeNumber,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", practiceId)
+
+      if (updateError) {
+        return NextResponse.json(
+          { error: "Failed to update practice with Twilio number" },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        phoneNumber: fakeNumber,
+        message: "DEV MODE - Fake number assigned",
       })
     }
 

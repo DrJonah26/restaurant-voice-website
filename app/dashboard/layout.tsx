@@ -117,7 +117,7 @@ export default function DashboardLayout({
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
-            <h1 className="text-xl font-bold text-sidebar-foreground">VoiceAI Restaurant</h1>
+            <h1 className="text-xl font-bold text-sidebar-foreground">JoydeaI</h1>
             <Button
               variant="ghost"
               size="icon"
@@ -225,7 +225,7 @@ export default function DashboardLayout({
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-lg font-semibold">VoiceAI Restaurant</h1>
+            <h1 className="text-lg font-semibold">JoydeaI</h1>
             <div className="w-10" />
           </div>
         </header>

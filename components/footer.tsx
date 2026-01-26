@@ -18,7 +18,7 @@ export function Footer() {
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <Phone className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="text-xl font-semibold text-foreground">VoiceAI Restaurant</span>
+              <span className="text-xl font-semibold text-foreground">JoydeaI</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Die intelligente Lösung für Restaurant-Telefonie.
@@ -46,7 +46,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2024 VoiceAI Restaurant. Alle Rechte vorbehalten.
+            © 2024 JoydeaI. Alle Rechte vorbehalten.
           </p>
           <div className="flex items-center gap-6">
             <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">

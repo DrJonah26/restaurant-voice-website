@@ -20,8 +20,7 @@ export function HeroSection() {
         </div>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight tracking-tight max-w-5xl mx-auto text-balance">
-          Nie wieder verpasste{" "}
-          <span className="text-muted-foreground">Anrufe</span>
+          Nie wieder verpasste Anrufe
         </h1>
 
         <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed text-pretty">
@@ -41,20 +40,6 @@ export function HeroSection() {
           </Button>
         </div>
 
-        {/* Stats */}
-        <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-          {[
-            { value: "98%", label: "Anrufe beantwortet" },
-            { value: "24/7", label: "Erreichbarkeit" },
-            { value: "500+", label: "Restaurants" },
-            { value: "2M+", label: "Reservierungen" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-foreground">{stat.value}</div>
-              <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   )

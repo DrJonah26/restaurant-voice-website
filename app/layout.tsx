@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 
-const inter = Inter({ subsets: ["latin"] })
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
   title: "Voice AI Restaurant Assistent",
@@ -17,12 +18,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="de" suppressHydrationWarning className="dark">
-      <body className={inter.className}>
+    <html lang="de" suppressHydrationWarning>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
+          defaultTheme="light"
+          enableSystem
           disableTransitionOnChange
         >
           {children}

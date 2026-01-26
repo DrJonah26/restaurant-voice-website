@@ -169,8 +169,8 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl glass-card border-border/50">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl border border-border shadow-sm">
         <CardHeader>
           <div className="space-y-2">
             <div className="flex items-center justify-between">

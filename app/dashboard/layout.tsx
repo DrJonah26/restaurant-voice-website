@@ -110,14 +110,14 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-64 glass-card border-r border-border/50 transform transition-transform duration-300 md:translate-x-0",
+          "fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border transform transition-transform duration-300 md:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b">
-            <h1 className="text-xl font-bold text-primary">VoiceAI Restaurant</h1>
+          <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
+            <h1 className="text-xl font-bold text-sidebar-foreground">VoiceAI Restaurant</h1>
             <Button
               variant="ghost"
               size="icon"
@@ -140,8 +140,8 @@ export default function DashboardLayout({
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-muted"
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
                   <item.icon className="h-5 w-5" />
@@ -152,7 +152,7 @@ export default function DashboardLayout({
           </nav>
 
           {/* User Profile */}
-          <div className="p-4 border-t">
+          <div className="p-4 border-t border-sidebar-border">
             {mounted ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -216,7 +216,7 @@ export default function DashboardLayout({
       {/* Main Content */}
       <div className="md:ml-64">
         {/* Mobile Header */}
-        <header className="sticky top-0 z-30 border-b border-border/50 glass md:hidden">
+        <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md md:hidden">
           <div className="flex items-center justify-between p-4">
             <Button
               variant="ghost"

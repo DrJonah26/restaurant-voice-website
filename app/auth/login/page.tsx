@@ -57,13 +57,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-gradient-to-br from-background via-background to-secondary/20">
+    <div className="min-h-screen grid md:grid-cols-2 bg-background">
       {/* Left Side - Image */}
-      <div className="hidden md:block relative bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border-r border-border/50">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+      <div className="hidden md:block relative bg-secondary/30 border-r border-border">
         <div className="relative h-full flex items-center justify-center p-12 text-foreground">
-          <div className="glass-card p-8 rounded-2xl">
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+          <div className="bg-card border border-border p-8 rounded-2xl shadow-sm">
+            <h2 className="text-4xl font-bold mb-4">
               Willkommen zurück!
             </h2>
             <p className="text-xl opacity-90">
@@ -75,7 +74,7 @@ export default function LoginPage() {
 
       {/* Right Side - Form */}
       <div className="flex items-center justify-center p-8">
-        <Card className="w-full max-w-md glass-card border-border/50">
+        <Card className="w-full max-w-md border border-border shadow-sm">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold">Anmelden</CardTitle>
             <CardDescription>

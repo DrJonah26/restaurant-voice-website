@@ -62,7 +62,7 @@ export default function DashboardPage() {
         now.getDate()
       )
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
       const todayDate = toDateString(todayStart)
       const monthStartDate = toDateString(monthStart)
       const monthEndDate = toDateString(monthEnd)
@@ -78,12 +78,14 @@ export default function DashboardPage() {
           .from("call_logs")
           .select("id", { count: "exact", head: true })
           .eq("practice_id", practices.id)
-          .gte("created_at", todayStart.toISOString()),
+          .gte("started_at", todayStart.toISOString())
+          .lte("started_at", now.toISOString()),
         supabase
           .from("call_logs")
           .select("id", { count: "exact", head: true })
           .eq("practice_id", practices.id)
-          .gte("created_at", monthStart.toISOString()),
+          .gte("started_at", monthStart.toISOString())
+          .lte("started_at", monthEnd.toISOString()),
         supabase
           .from("reservations")
           .select("id", { count: "exact", head: true })

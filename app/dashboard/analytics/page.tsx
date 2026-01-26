@@ -83,24 +83,26 @@ export default function AnalyticsPage() {
       const startIso = start.toISOString()
       const endIso = end.toISOString()
 
+      const practiceId = restaurantData.practice_id ?? restaurantData.id
+
       const [callsResult, reservationsResult, callLogsResult] = await Promise.all([
         supabase
           .from("call_logs")
           .select("id", { count: "exact", head: true })
-          .eq("practice_id", restaurantData.id)
+          .eq("practice_id", practiceId)
           .gte("started_at", startIso)
           .lte("started_at", endIso),
         supabase
           .from("reservations")
           .select("id", { count: "exact", head: true })
-          .eq("practice_id", restaurantData.id)
+          .eq("practice_id", practiceId)
           .in("status", ["confirmed", "completed"])
           .gte("created_at", startIso)
           .lte("created_at", endIso),
         supabase
           .from("call_logs")
           .select("started_at")
-          .eq("practice_id", restaurantData.id)
+          .eq("practice_id", practiceId)
           .gte("started_at", startIso)
           .lte("started_at", endIso),
       ])

@@ -54,6 +54,7 @@ export default function DashboardPage() {
       }
 
       setRestaurant(practices)
+      const practiceId = practices.practice_id ?? practices.id
 
       const now = new Date()
       const todayStart = new Date(
@@ -77,30 +78,30 @@ export default function DashboardPage() {
         supabase
           .from("call_logs")
           .select("id", { count: "exact", head: true })
-          .eq("practice_id", practices.id)
+          .eq("practice_id", practiceId)
           .gte("started_at", todayStart.toISOString())
           .lte("started_at", now.toISOString()),
         supabase
           .from("call_logs")
           .select("id", { count: "exact", head: true })
-          .eq("practice_id", practices.id)
+          .eq("practice_id", practiceId)
           .gte("started_at", monthStart.toISOString())
           .lte("started_at", monthEnd.toISOString()),
         supabase
           .from("reservations")
           .select("id", { count: "exact", head: true })
-          .eq("practice_id", practices.id)
+          .eq("practice_id", practiceId)
           .eq("date", todayDate),
         supabase
           .from("reservations")
           .select("id", { count: "exact", head: true })
-          .eq("practice_id", practices.id)
+          .eq("practice_id", practiceId)
           .gte("date", monthStartDate)
           .lte("date", monthEndDate),
         supabase
           .from("reservations")
           .select("*")
-          .eq("practice_id", practices.id)
+          .eq("practice_id", practiceId)
           .order("date", { ascending: false })
           .order("time", { ascending: false })
           .limit(5),

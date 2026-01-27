@@ -58,11 +58,23 @@ export default function BillingPage() {
         return
       }
 
+      const practiceId = restaurantData.practice_id ?? restaurantData.id
+      const now = new Date()
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+
+      const callsMonthResult = await supabase
+        .from("call_logs")
+        .select("id", { count: "exact", head: true })
+        .eq("practice_id", practiceId)
+        .gte("started_at", monthStart.toISOString())
+        .lte("started_at", monthEnd.toISOString())
+
       setRestaurant(restaurantData)
       const planKey = getStripePlanKey(restaurantData.subscription_plan)
       setCurrentPlan(planKey)
       setUsage({
-        calls: restaurantData.calls_this_month || 0,
+        calls: callsMonthResult.count ?? 0,
         limit:
           restaurantData.calls_limit ??
           STRIPE_PLANS[planKey as keyof typeof STRIPE_PLANS].calls,
@@ -166,11 +178,15 @@ const handleUpgrade = async (planKey: string) => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Anrufe</span>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-sm font-medium">Anrufe diesen Monat</span>
               <span className="text-sm text-muted-foreground">
-                {usage.calls} / {usage.limit}
+                {usage.calls}
+                {usage.limit ? ` / ${usage.limit}` : ""}
               </span>
+            </div>
+            <div className="text-xs text-muted-foreground mb-2">
+              {usage.limit ? "Monatslimit" : "Kein Limit gesetzt"}
             </div>
             <Progress value={usagePercentage} className="h-2" />
             {usagePercentage > 80 && (

@@ -32,6 +32,8 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [provisioningNumber, setProvisioningNumber] = useState(false)
+  const [provisionedNumber, setProvisionedNumber] = useState<string | null>(null)
+  const [showGuide, setShowGuide] = useState(false)
   const supabase = createClient()
 
   // ⬇️ HIER
@@ -141,12 +143,18 @@ export default function OnboardingPage() {
         throw new Error(result.details || result.error || "Fehler beim Einrichten der Telefonnummer")
       }
 
+      setProvisionedNumber(result.phoneNumber ?? null)
+
       const { error: completionError } = await supabase
         .from("practices")
         .update({ onboarding_completed: true })
         .eq("user_id", user.id)
 
       if (completionError) throw completionError
+
+      setShowGuide(true)
+      setLoading(false)
+      setProvisioningNumber(false)
 
       // Trigger confetti
       if (typeof window !== "undefined") {
@@ -158,13 +166,20 @@ export default function OnboardingPage() {
       }
 
       toast.success(`Onboarding abgeschlossen! Nummer: ${result.phoneNumber}`)
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 1500)
     } catch (error: any) {
       toast.error(error.message || "Fehler beim Speichern")
       setLoading(false)
       setProvisioningNumber(false)
+    }
+  }
+
+  const handleCopyNumber = async () => {
+    if (!provisionedNumber) return
+    try {
+      await navigator.clipboard.writeText(provisionedNumber)
+      toast.success("Nummer kopiert")
+    } catch (error: any) {
+      toast.error(error.message || "Kopieren fehlgeschlagen")
     }
   }
 
@@ -401,17 +416,76 @@ export default function OnboardingPage() {
                     )}
                   </CardContent>
                 </Card>
+                {showGuide && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Anrufweiterleitung in 3 Schritten</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <p className="text-sm font-semibold text-muted-foreground">Ihre neue Nummer</p>
+                        <div className="flex items-center gap-3">
+                          <p className="text-lg font-medium">
+                            {provisionedNumber ?? "Noch nicht verfuegbar"}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleCopyNumber}
+                            disabled={!provisionedNumber}
+                          >
+                            Kopieren
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm font-semibold text-muted-foreground">Schritt 1</p>
+                        <p className="text-sm">
+                          Waehlen Sie Ihren Anbieter oder Ihr Telefonsystem und oeffnen Sie
+                          die Einstellungen fuer Rufumleitungen.
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm font-semibold text-muted-foreground">Schritt 2</p>
+                        <p className="text-sm">
+                          Aktivieren Sie eine bedingungslose Weiterleitung (immer) auf die neue Nummer.
+                        </p>
+                        <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
+                          <div className="font-medium">Beispiel (Mobilfunk, GSM)</div>
+                          <div>*21*NEUE_NUMMER#</div>
+                          <div>Deaktivieren: ##21#</div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm font-semibold text-muted-foreground">Schritt 3</p>
+                        <p className="text-sm">
+                          Testen Sie die Weiterleitung, indem Sie Ihre alte Nummer anrufen.
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Hinweis: Die Codes koennen je nach Anbieter abweichen.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={handleBack} className="flex-1">
                     Zurück
                   </Button>
-                  <Button onClick={handleFinish} className="flex-1" disabled={loading}>
+                  {showGuide ? (
+                    <Button onClick={() => router.push("/dashboard")} className="flex-1">
+                      Dashboard oeffnen
+                    </Button>
+                  ) : (
+                    <Button onClick={handleFinish} className="flex-1" disabled={loading}>
                     {loading
                       ? provisioningNumber
                         ? "📞 Telefonnummer wird eingerichtet..."
                         : "Wird gespeichert..."
                       : "Dashboard öffnen"}
                   </Button>
+                  )}
                 </div>
               </motion.div>
             )}

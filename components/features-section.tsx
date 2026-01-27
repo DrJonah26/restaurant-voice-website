@@ -1,10 +1,10 @@
-import { Phone, Calendar, Clock, MessageSquare, BarChart3, Globe } from "lucide-react"
+import { Phone, Calendar, Clock, BarChart3 } from "lucide-react"
 
 const features = [
   {
     icon: Phone,
     title: "Natürliche Gespräche",
-    description: "Die KI spricht natürlich und verarbeitet komplexe Anfragen – wie Ihr bester Mitarbeiter.",
+    description: "Die KI spricht natürlich und verarbeitet komplexe Anfragen; wie Ihr bester Mitarbeiter.",
   },
   {
     icon: Calendar,
@@ -14,29 +14,23 @@ const features = [
   {
     icon: Clock,
     title: "24/7 Erreichbarkeit",
-    description: "Kein Anruf geht verloren – auch außerhalb der Öffnungszeiten oder in Stoßzeiten.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Mehrsprachig",
-    description: "Kommunizieren Sie mit Gästen in ihrer bevorzugten Sprache – ohne Mehraufwand.",
+    description: "Kein Anruf geht verloren; auch außerhalb der Öffnungszeiten oder in Stoßzeiten.",
   },
   {
     icon: BarChart3,
     title: "Analytics Dashboard",
-    description: "Echtzeit-Insights zu Anrufen, Buchungen und Präferenzen – für bessere Entscheidungen.",
-  },
-  {
-    icon: Globe,
-    title: "System-Integration",
-    description: "Nahtlose Anbindung an bestehende Reservierungs- oder Kassensysteme.",
+    description: "Echtzeit-Insights zu Anrufen, Buchungen und Präferenzen; für bessere Entscheidungen.",
   },
 ]
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-24 bg-secondary/30">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="features" className="section-fade relative overflow-hidden py-24 bg-secondary/30">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(1800px_780px_at_45%_55%,_rgba(59,130,246,0.22),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1200px_520px_at_60%_45%,_rgba(37,99,235,0.18),_transparent_72%)]" />
+      </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <span className="text-sm font-medium text-accent uppercase tracking-wider">Features</span>
           <h2 className="mt-4 text-3xl md:text-5xl font-bold text-foreground text-balance">
@@ -47,7 +41,7 @@ export function FeaturesSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
           {features.map((feature) => (
             <div
               key={feature.title}
@@ -65,3 +59,4 @@ export function FeaturesSection() {
     </section>
   )
 }
+

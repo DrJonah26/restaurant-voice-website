@@ -58,8 +58,12 @@ const plans = [
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="py-24 bg-secondary/30">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="pricing" className="section-fade relative overflow-hidden py-24 bg-secondary/30">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(1900px_820px_at_48%_52%,_rgba(59,130,246,0.22),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1250px_560px_at_60%_45%,_rgba(37,99,235,0.18),_transparent_72%)]" />
+      </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <span className="text-sm font-medium text-accent uppercase tracking-wider">Preise</span>
           <h2 className="mt-4 text-3xl md:text-5xl font-bold text-foreground text-balance">

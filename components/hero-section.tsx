@@ -6,11 +6,21 @@ import { ArrowRight, Play } from "lucide-react"
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center pt-16 pb-8 overflow-hidden">
+    <section className="section-fade section-fade-sm relative min-h-[80vh] flex items-center justify-center pt-16 pb-8 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-secondary rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(2400px_920px_at_50%_50%,_rgba(59,130,246,0.28),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1720px_680px_at_50%_52%,_rgba(37,99,235,0.22),_transparent_72%)]" />
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(59,130,246,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(59,130,246,0.07) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+          }}
+        />
+        <div className="absolute top-[34%] left-[4%] w-[64rem] h-[52rem] bg-accent/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-[28%] right-[8%] w-[56rem] h-[46rem] bg-accent/14 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 text-center">

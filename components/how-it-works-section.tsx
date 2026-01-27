@@ -26,19 +26,33 @@ const steps = [
 ]
 
 const chatMessages = [
-  { type: "user", text: "Hallo, ich würde gern für heute Abend reservieren.", time: "0:02" },
-  { type: "ai", text: "Sehr gerne! Für wie viele Personen und welche Uhrzeit?", time: "0:05" },
-  { type: "user", text: "4 Personen um 19:30 Uhr, bitte.", time: "0:09" },
-  { type: "ai", text: "Perfekt! Ich habe noch einen Tisch frei. Darf ich Ihren Namen notieren?", time: "0:12" },
-  { type: "user", text: "Sarah Müller.", time: "0:15" },
-  { type: "ai", text: "Super, Sarah! Der Tisch für 4 Personen um 19:30 Uhr ist bestätigt. Bis später!", time: "0:18" },
+  { type: "ai", text: "Restaurant Lindenhof, guten Tag. Wie kann ich Ihnen behilflich sein?" },
+  { type: "user", text: "Guten Tag, ich würde gerne einen Tisch bei Ihnen reservieren." },
+  { type: "ai", text: "Sehr gerne! Für welches Datum und um welche Uhrzeit soll die Reservierung sein?" },
+  { type: "user", text: "Bitte für übermorgen um 16:00 Uhr." },
+  { type: "ai", text: "Wir haben von 1700-22:00 Uhr geöffnet. Welche Zeit würde ihnen passen übermorgen nach 17:00 Uhr?" },
+  { type: "user", text: "Ahhh, achso. Ja dann doch um 18:00 Uhr." },
+  { type: "ai", text: "Alles klar, übermorgen um 18:00 Uhr. Für wieviele Personen soll der Tisch sein?" },
+  { type: "user", text: "Für 2 Leute." },
+  { type: "ai", text: "Einen Moment, ich überprüfe jetzt, ob wir noch einen Tisch frei haben..." },
+  { type: "ai", text: "Super, da haben wir noch einen Tisch frei. Auf welchen Namen darf ich reservien?" },
+  { type: "user", text: "Ahh, nein sorry, mir fällt gerade ein, ich kann übermoregn gar nicht. Bitte doch erst am Freitag." },
+  { type: "ai", text: "Alles klar, also am Freitag. Um welche Uhrzeit möchten sie da kommen?" },
+  { type: "user", text: "Achso, ja dann wieder um 18:00 Uhr am besten." },
+  { type: "ai", text: "Also am Freitag, um 18:00 Uhr für 2 Personen, richtig?" },
+  { type: "user", text: "Genau." },
+  { type: "ai", text: "Super, da haben wir noch einen Tisch frei. Auf welchen Namen darf ich reservien?" },
+  { type: "user", text: "Jonah Alt." },
+  { type: "ai", text: "Also, Freitag um 18 Uhr für 2 Personen auf Jonah Alt. Ist das so korrekt?" },
+  { type: "user", text: "Genau, das stimmt." },
+  { type: "ai", text: "Perfekt, die Reservierung ist eingetragen. Vielen Dank, und bis Freitag!" },
+  { type: "user", text: "Bis Freitag." },
 ]
 
 export function HowItWorksSection() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(22)
-  const [activeMessage, setActiveMessage] = useState(-1)
+  const [duration, setDuration] = useState(75)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const togglePlay = () => {
@@ -52,23 +66,6 @@ export function HowItWorksSection() {
     }
   }
 
-  useEffect(() => {
-    const timeToSeconds = (time: string) => {
-      const [mins, secs] = time.split(':').map(Number)
-      return mins * 60 + secs
-    }
-    
-    const currentMessage = chatMessages.findIndex((msg, index) => {
-      const msgTime = timeToSeconds(msg.time)
-      const nextTime = index < chatMessages.length - 1 
-        ? timeToSeconds(chatMessages[index + 1].time)
-        : duration
-      return currentTime >= msgTime && currentTime < nextTime
-    })
-    
-    setActiveMessage(currentMessage)
-  }, [currentTime, duration])
-
   const formatTime = (time: number) => {
     const mins = Math.floor(time / 60)
     const secs = Math.floor(time % 60)
@@ -78,8 +75,12 @@ export function HowItWorksSection() {
   return (
     <>
       {/* Steps Section */}
-      <section id="how-it-works" className="py-20 bg-background">
-        <div className="max-w-5xl mx-auto px-6">
+      <section id="how-it-works" className="section-fade relative overflow-hidden py-20 bg-background">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(1600px_700px_at_55%_52%,_rgba(59,130,246,0.2),_transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(1100px_480px_at_40%_48%,_rgba(37,99,235,0.16),_transparent_72%)]" />
+        </div>
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <span className="text-sm font-medium text-accent uppercase tracking-wider">So funktioniert's</span>
             <h2 className="mt-3 text-3xl md:text-4xl font-bold text-foreground text-balance">
@@ -107,15 +108,19 @@ export function HowItWorksSection() {
       </section>
 
       {/* Demo Section */}
-      <section id="demo" className="py-20 bg-secondary/30">
-        <div className="max-w-5xl mx-auto px-6">
+      <section id="demo" className="section-fade relative overflow-hidden py-20 bg-secondary/30">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(1700px_740px_at_50%_55%,_rgba(59,130,246,0.21),_transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(1150px_520px_at_62%_45%,_rgba(37,99,235,0.17),_transparent_72%)]" />
+        </div>
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
             <span className="text-sm font-medium text-accent uppercase tracking-wider">Live Demo</span>
             <h2 className="mt-3 text-3xl md:text-4xl font-bold text-foreground text-balance">
               Hören Sie selbst
             </h2>
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-              Ein echtes Gespräch zwischen Gast und KI-Assistentin.
+              Ein Gespräch zwischen Gast und KI-Assistent.
             </p>
           </div>
 
@@ -221,14 +226,9 @@ export function HowItWorksSection() {
                           msg.type === 'user'
                             ? 'bg-primary text-primary-foreground rounded-br-md'
                             : 'bg-secondary text-foreground rounded-bl-md'
-                        } ${activeMessage === index ? 'ring-2 ring-accent' : ''}`}
+                        }`}
                       >
                         <p className="text-sm leading-relaxed">{msg.text}</p>
-                        <span className={`text-xs mt-1.5 block ${
-                          msg.type === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                        }`}>
-                          {msg.time}
-                        </span>
                       </div>
                     </div>
                   ))}
@@ -241,3 +241,7 @@ export function HowItWorksSection() {
     </>
   )
 }
+
+
+
+

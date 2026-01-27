@@ -16,14 +16,14 @@
     --secondary-foreground: oklch(0.12 0 0);
     --muted: oklch(0.96 0 0);
     --muted-foreground: oklch(0.45 0 0);
-    --accent: oklch(0.55 0.18 145);
+    --accent: oklch(0.56 0.14 232);
     --accent-foreground: oklch(0.99 0 0);
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.99 0 0);
     --border: oklch(0.9 0 0);
     --input: oklch(0.96 0 0);
-    --ring: oklch(0.55 0.18 145);
-    --chart-1: oklch(0.55 0.18 145);
+    --ring: oklch(0.56 0.14 232);
+    --chart-1: oklch(0.56 0.14 232);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
@@ -52,14 +52,14 @@
     --secondary-foreground: oklch(0.98 0 0);
     --muted: oklch(0.18 0 0);
     --muted-foreground: oklch(0.65 0 0);
-    --accent: oklch(0.55 0.18 145);
+    --accent: oklch(0.56 0.14 232);
     --accent-foreground: oklch(0.98 0 0);
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.98 0 0);
     --border: oklch(0.25 0 0);
     --input: oklch(0.18 0 0);
-    --ring: oklch(0.55 0.18 145);
-    --chart-1: oklch(0.55 0.18 145);
+    --ring: oklch(0.56 0.14 232);
+    --chart-1: oklch(0.56 0.14 232);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
@@ -81,5 +81,38 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .section-fade {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .section-fade::before,
+  .section-fade::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 120px;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .section-fade-sm::before,
+  .section-fade-sm::after {
+    height: 80px;
+  }
+
+  .section-fade::before {
+    top: -1px;
+    background: linear-gradient(to bottom, var(--background), transparent);
+  }
+
+  .section-fade::after {
+    bottom: -1px;
+    background: linear-gradient(to top, var(--background), transparent);
   }
 }

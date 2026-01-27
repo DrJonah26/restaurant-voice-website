@@ -37,26 +37,18 @@ const chatMessages = [
 export function HowItWorksSection() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
-  const [duration] = useState(22)
+  const [duration, setDuration] = useState(22)
   const [activeMessage, setActiveMessage] = useState(-1)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const togglePlay = () => {
-    if (isPlaying) {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      setIsPlaying(false)
+    const audio = audioRef.current
+    if (!audio) return
+
+    if (audio.paused) {
+      void audio.play()
     } else {
-      setIsPlaying(true)
-      intervalRef.current = setInterval(() => {
-        setCurrentTime(prev => {
-          if (prev >= duration) {
-            if (intervalRef.current) clearInterval(intervalRef.current)
-            setIsPlaying(false)
-            return 0
-          }
-          return prev + 0.1
-        })
-      }, 100)
+      audio.pause()
     }
   }
 
@@ -76,12 +68,6 @@ export function HowItWorksSection() {
     
     setActiveMessage(currentMessage)
   }, [currentTime, duration])
-
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [])
 
   const formatTime = (time: number) => {
     const mins = Math.floor(time / 60)
@@ -148,6 +134,27 @@ export function HowItWorksSection() {
                 </div>
 
                 <div className="bg-secondary rounded-xl p-5">
+                  <audio
+                    ref={audioRef}
+                    src="/audio/demo.mp3"
+                    preload="metadata"
+                    onLoadedMetadata={() => {
+                      const audio = audioRef.current
+                      if (audio) setDuration(audio.duration || 0)
+                    }}
+                    onTimeUpdate={() => {
+                      const audio = audioRef.current
+                      if (audio) setCurrentTime(audio.currentTime)
+                    }}
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onEnded={() => {
+                      const audio = audioRef.current
+                      if (audio) audio.currentTime = 0
+                      setCurrentTime(0)
+                      setIsPlaying(false)
+                    }}
+                  />
                   <div className="flex items-center gap-4">
                     <Button
                       onClick={togglePlay}

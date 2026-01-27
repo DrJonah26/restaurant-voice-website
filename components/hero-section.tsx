@@ -9,13 +9,13 @@ export function HeroSection() {
     <section className="section-fade section-fade-sm relative min-h-[80vh] flex items-center justify-center pt-16 pb-8 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(2400px_920px_at_50%_50%,_rgba(59,130,246,0.28),_transparent_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1720px_680px_at_50%_52%,_rgba(37,99,235,0.22),_transparent_72%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(2400px_920px_at_50%_50%,_rgba(253,224,71,0.28),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1720px_680px_at_50%_52%,_rgba(250,204,21,0.22),_transparent_72%)]" />
         <div
           className="absolute inset-0 opacity-40"
           style={{
             backgroundImage:
-              "linear-gradient(to right, rgba(59,130,246,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(59,130,246,0.07) 1px, transparent 1px)",
+              "linear-gradient(to right, rgba(250,204,21,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(250,204,21,0.07) 1px, transparent 1px)",
             backgroundSize: "64px 64px",
           }}
         />

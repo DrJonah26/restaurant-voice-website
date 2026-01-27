@@ -16,7 +16,7 @@ const plans = [
       "Basis Analytics",
       "Perfekt für Anrufe außerhalb der Öffnungszeiten",
     ],
-    cta: "Plan wählen",
+    cta: "Jezzt kostenlos testen",
     subPrice: "30€ / Monat danach",
     highlighted: false,
   },
@@ -60,8 +60,8 @@ export function PricingSection() {
   return (
     <section id="pricing" className="section-fade relative overflow-hidden py-24 bg-secondary/30">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(1900px_820px_at_48%_52%,_rgba(59,130,246,0.22),_transparent_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1250px_560px_at_60%_45%,_rgba(37,99,235,0.18),_transparent_72%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1900px_820px_at_48%_52%,_rgba(253,224,71,0.22),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1250px_560px_at_60%_45%,_rgba(250,204,21,0.18),_transparent_72%)]" />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">

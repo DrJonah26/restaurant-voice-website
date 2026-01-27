@@ -1,6 +1,9 @@
+import type { CSSProperties } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
+import { ScrollReveal } from "@/components/scroll-reveal"
+import { RevealWords } from "@/components/reveal-words"
 
 const plans = [
   {
@@ -58,31 +61,38 @@ const plans = [
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="section-fade relative overflow-hidden py-24 bg-secondary/30">
+    <ScrollReveal
+      as="section"
+      id="pricing"
+      className="section-fade relative overflow-hidden py-24 bg-secondary/30"
+    >
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(1900px_820px_at_48%_52%,_rgba(253,224,71,0.22),_transparent_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1250px_560px_at_60%_45%,_rgba(250,204,21,0.18),_transparent_72%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1900px_820px_at_48%_52%,_rgba(59,130,246,0.22),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1250px_560px_at_60%_45%,_rgba(37,99,235,0.18),_transparent_72%)]" />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <span className="text-sm font-medium text-accent uppercase tracking-wider">Preise</span>
+          <span className="text-sm font-medium text-accent uppercase tracking-wider">
+            <RevealWords text="Preise" startDelay={40} step={80} />
+          </span>
           <h2 className="mt-4 text-3xl md:text-5xl font-bold text-foreground text-balance">
-            Klare, transparente Preise
+            <RevealWords text="Klare, transparente Preise" startDelay={100} step={60} />
           </h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Starten Sie mit einer kostenlosen Testphase – keine Kreditkarte nötig.
+            <RevealWords text="Starten Sie mit einer kostenlosen Testphase – keine Kreditkarte nötig." startDelay={140} step={40} />
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan) => (
+          {plans.map((plan, index) => (
             <div
               key={plan.name}
-              className={`relative rounded-3xl p-8 ${
+              className={`reveal-item relative rounded-3xl p-8 ${
                 plan.highlighted
                   ? "bg-card border-2 border-accent"
                   : "bg-card border border-border"
               }`}
+              style={{ "--reveal-delay": `${300 + index * 220}ms` } as CSSProperties}
             >
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-accent rounded-full">
@@ -91,7 +101,9 @@ export function PricingSection() {
               )}
 
               <div className="mb-8">
-                <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
+                <h3 className="text-xl font-semibold text-foreground">
+                  <RevealWords text={plan.name} startDelay={120} step={45} />
+                </h3>
                 <div className="mt-4 flex items-baseline gap-1">
                   <span className="text-4xl font-bold text-foreground">{plan.price}</span>
                   <span className="text-muted-foreground">{plan.period}</span>
@@ -99,14 +111,18 @@ export function PricingSection() {
                 {plan.subPrice ? (
                   <p className="mt-2 text-sm text-muted-foreground">{plan.subPrice}</p>
                 ) : null}
-                <p className="mt-3 text-muted-foreground">{plan.description}</p>
+                <p className="mt-3 text-muted-foreground">
+                  <RevealWords text={plan.description} startDelay={160} step={30} />
+                </p>
               </div>
 
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
                     <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-foreground">{feature}</span>
+                    <span className="text-foreground">
+                      <RevealWords text={feature} startDelay={120} step={28} />
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -135,13 +151,13 @@ export function PricingSection() {
 
               {plan.helper ? (
                 <p className="mt-4 text-sm text-muted-foreground">
-                  {plan.helper}
+                  <RevealWords text={plan.helper} startDelay={160} step={30} />
                 </p>
               ) : null}
             </div>
           ))}
         </div>
       </div>
-    </section>
+    </ScrollReveal>
   )
 }

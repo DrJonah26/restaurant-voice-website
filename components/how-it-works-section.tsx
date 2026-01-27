@@ -1,8 +1,11 @@
 "use client"
 
+import type { CSSProperties } from "react"
 import { useState, useRef, useEffect } from "react"
 import { Play, Pause, Volume2, Mic, Phone, Settings, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ScrollReveal } from "@/components/scroll-reveal"
+import { RevealWords } from "@/components/reveal-words"
 
 const steps = [
   {
@@ -75,59 +78,81 @@ export function HowItWorksSection() {
   return (
     <>
       {/* Steps Section */}
-      <section id="how-it-works" className="section-fade relative overflow-hidden py-20 bg-background">
+      <ScrollReveal
+        as="section"
+        id="how-it-works"
+        className="section-fade relative overflow-hidden py-20 bg-background"
+      >
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(1600px_700px_at_55%_52%,_rgba(253,224,71,0.2),_transparent_70%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(1100px_480px_at_40%_48%,_rgba(250,204,21,0.16),_transparent_72%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(1600px_700px_at_55%_52%,_rgba(59,130,246,0.2),_transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(1100px_480px_at_40%_48%,_rgba(37,99,235,0.16),_transparent_72%)]" />
         </div>
         <div className="relative z-10 max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
-            <span className="text-sm font-medium text-accent uppercase tracking-wider">So funktioniert's</span>
+            <span className="text-sm font-medium text-accent uppercase tracking-wider">
+              <RevealWords text="So funktioniert's" startDelay={40} step={70} />
+            </span>
             <h2 className="mt-3 text-3xl md:text-4xl font-bold text-foreground text-balance">
-              In wenigen Minuten startklar
+              <RevealWords text="In wenigen Minuten startklar" startDelay={110} step={60} />
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {steps.map((step) => (
+            {steps.map((step, index) => (
               <div key={step.number} className="relative">
-                <div className="bg-card border border-border rounded-2xl p-6 h-full hover:shadow-lg hover:border-accent/30 transition-all">
+                <div
+                  className="reveal-item bg-card border border-border rounded-2xl p-6 h-full hover:shadow-lg hover:border-accent/30 transition-all"
+                  style={{ "--reveal-delay": `${260 + index * 200}ms` } as CSSProperties}
+                >
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
                       <step.icon className="w-6 h-6 text-accent" />
                     </div>
                     <span className="text-3xl font-bold text-muted-foreground/30">{step.number}</span>
                   </div>
-                  <h3 className="font-semibold text-foreground text-lg mb-2">{step.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                  <h3 className="font-semibold text-foreground text-lg mb-2">
+                    <RevealWords text={step.title} startDelay={120} step={45} />
+                  </h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    <RevealWords text={step.description} startDelay={160} step={30} />
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </ScrollReveal>
 
       {/* Demo Section */}
-      <section id="demo" className="section-fade relative overflow-hidden py-20 bg-secondary/30">
+      <ScrollReveal
+        as="section"
+        id="demo"
+        className="section-fade relative overflow-hidden py-20 bg-secondary/30"
+      >
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(1700px_740px_at_50%_55%,_rgba(253,224,71,0.21),_transparent_70%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(1150px_520px_at_62%_45%,_rgba(250,204,21,0.17),_transparent_72%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(1700px_740px_at_50%_55%,_rgba(59,130,246,0.21),_transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(1150px_520px_at_62%_45%,_rgba(37,99,235,0.17),_transparent_72%)]" />
         </div>
         <div className="relative z-10 max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
-            <span className="text-sm font-medium text-accent uppercase tracking-wider">Live Demo</span>
+            <span className="text-sm font-medium text-accent uppercase tracking-wider">
+              <RevealWords text="Live Demo" startDelay={40} step={70} />
+            </span>
             <h2 className="mt-3 text-3xl md:text-4xl font-bold text-foreground text-balance">
-              Hören Sie selbst
+              <RevealWords text="Hören Sie selbst" startDelay={120} step={60} />
             </h2>
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-              Ein Gespräch zwischen Gast und KI-Assistent.
+              <RevealWords text="Ein Gespräch zwischen Gast und KI-Assistent." startDelay={160} step={40} />
             </p>
           </div>
 
           <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-lg">
             <div className="grid md:grid-cols-2">
               {/* Audio Player */}
-              <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-border">
+              <div
+                className="reveal-item p-6 md:p-8 border-b md:border-b-0 md:border-r border-border"
+                style={{ "--reveal-delay": "260ms" } as CSSProperties}
+              >
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
                     <Mic className="w-6 h-6 text-accent-foreground" />
@@ -209,7 +234,10 @@ export function HowItWorksSection() {
               </div>
 
               {/* Chat Transcript */}
-              <div className="p-6 md:p-8">
+              <div
+                className="reveal-item p-6 md:p-8"
+                style={{ "--reveal-delay": "340ms" } as CSSProperties}
+              >
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-3 h-3 rounded-full bg-accent animate-pulse" />
                   <span className="font-semibold text-foreground">Transkript</span>
@@ -237,11 +265,7 @@ export function HowItWorksSection() {
             </div>
           </div>
         </div>
-      </section>
+      </ScrollReveal>
     </>
   )
 }
-
-
-
-

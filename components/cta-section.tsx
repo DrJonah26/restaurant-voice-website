@@ -6,8 +6,8 @@ export function CTASection() {
   return (
     <section className="section-fade relative overflow-hidden py-24 bg-secondary/30">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_520px_at_50%_48%,_rgba(253,224,71,0.16),_transparent_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(820px_360px_at_45%_55%,_rgba(250,204,21,0.12),_transparent_72%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1200px_520px_at_50%_48%,_rgba(59,130,246,0.16),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(820px_360px_at_45%_55%,_rgba(37,99,235,0.12),_transparent_72%)]" />
       </div>
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
         <h2 className="text-3xl md:text-5xl font-bold text-foreground text-balance">

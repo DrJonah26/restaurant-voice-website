@@ -20,9 +20,6 @@ export function CTASection() {
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </Link>
-          <Button variant="outline" size="lg" className="px-8 py-6 text-base border-border text-foreground hover:bg-secondary bg-transparent">
-            Demo vereinbaren
-          </Button>
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">

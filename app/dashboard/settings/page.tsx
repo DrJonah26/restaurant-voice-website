@@ -7,14 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
-import { Phone, Save } from "lucide-react"
+import { Save } from "lucide-react"
 
 const DAYS = [
   { value: "monday", label: "Montag" },
@@ -26,23 +24,6 @@ const DAYS = [
   { value: "sunday", label: "Sonntag" },
 ]
 
-const VOICE_OPTIONS = [
-  { value: "male-1", label: "Männlich - Stimme 1" },
-  { value: "male-2", label: "Männlich - Stimme 2" },
-  { value: "female-1", label: "Weiblich - Stimme 1" },
-  { value: "female-2", label: "Weiblich - Stimme 2" },
-  { value: "female-3", label: "Weiblich - Stimme 3" },
-]
-
-const RESTAURANT_TYPES = [
-  { value: "restaurant", label: "Restaurant" },
-  { value: "cafe", label: "Café" },
-  { value: "bar", label: "Bar" },
-  { value: "bistro", label: "Bistro" },
-  { value: "pizzeria", label: "Pizzeria" },
-  { value: "other", label: "Sonstiges" },
-]
-
 export default function SettingsPage() {
   const router = useRouter()
   const [restaurant, setRestaurant] = useState<any>(null)
@@ -51,17 +32,10 @@ export default function SettingsPage() {
 
   // Restaurant settings
   const [restaurantName, setRestaurantName] = useState("")
-  const [restaurantType, setRestaurantType] = useState("restaurant")
   const [maxCapacity, setMaxCapacity] = useState([50])
   const [openingTime, setOpeningTime] = useState("09:00")
   const [closingTime, setClosingTime] = useState("22:00")
   const [closedDays, setClosedDays] = useState<string[]>([])
-
-  // Voice Agent settings
-  const [voice, setVoice] = useState("female-1")
-  const [language, setLanguage] = useState("de")
-  const [greetingText, setGreetingText] = useState("")
-  const [greetingCharCount, setGreetingCharCount] = useState(0)
 
   // Phone settings
   const [phoneNumber, setPhoneNumber] = useState("")
@@ -91,15 +65,10 @@ export default function SettingsPage() {
 
       setRestaurant(restaurantData)
       setRestaurantName(restaurantData.name || "")
-      setRestaurantType(restaurantData.type || "restaurant")
       setMaxCapacity([restaurantData.max_capacity || 50])
       setOpeningTime(restaurantData.opening_time || "09:00")
       setClosingTime(restaurantData.closing_time || "22:00")
       setClosedDays(restaurantData.closed_days || [])
-      setVoice(restaurantData.voice || "female-1")
-      setLanguage(restaurantData.language || "de")
-      setGreetingText(restaurantData.greeting_text || "")
-      setGreetingCharCount(restaurantData.greeting_text?.length || 0)
       setPhoneNumber(restaurantData.phone || "")
       setCallForwarding(restaurantData.call_forwarding || false)
     }
@@ -120,7 +89,6 @@ export default function SettingsPage() {
         .from("practices")
         .update({
           name: restaurantName,
-          type: restaurantType,
           max_capacity: maxCapacity[0],
           opening_time: openingTime,
           closing_time: closingTime,
@@ -136,33 +104,6 @@ export default function SettingsPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleSaveVoiceAgent = async () => {
-    setLoading(true)
-    try {
-      const { error } = await supabase
-        .from("practices")
-        .update({
-          voice,
-          language,
-          greeting_text: greetingText,
-        })
-        .eq("id", restaurant.id)
-
-      if (error) throw error
-
-      toast.success("Voice Agent-Einstellungen gespeichert")
-    } catch (error: any) {
-      toast.error(error.message || "Fehler beim Speichern")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleTestCall = () => {
-    toast.info("Test-Anruf wird gestartet...")
-    // Implement test call logic
   }
 
   const handleSavePhone = async () => {
@@ -197,7 +138,6 @@ export default function SettingsPage() {
       <Tabs defaultValue="restaurant" className="space-y-6">
         <TabsList>
           <TabsTrigger value="restaurant">Restaurant</TabsTrigger>
-          <TabsTrigger value="voice">Voice Agent</TabsTrigger>
           <TabsTrigger value="phone">Telefon</TabsTrigger>
         </TabsList>
 
@@ -218,21 +158,6 @@ export default function SettingsPage() {
                   value={restaurantName}
                   onChange={(e) => setRestaurantName(e.target.value)}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="type">Restaurant Typ</Label>
-                <Select value={restaurantType} onValueChange={setRestaurantType}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {RESTAURANT_TYPES.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Maximale Kapazität: {maxCapacity[0]} Personen</Label>
@@ -288,79 +213,6 @@ export default function SettingsPage() {
                 <Save className="mr-2 h-4 w-4" />
                 Speichern
               </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Voice Agent Tab */}
-        <TabsContent value="voice">
-          <Card>
-            <CardHeader>
-              <CardTitle>Voice Agent-Einstellungen</CardTitle>
-              <CardDescription>
-                Konfigurieren Sie die Stimme und das Verhalten Ihrer KI-Assistentin
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="voice">Stimme</Label>
-                <Select value={voice} onValueChange={setVoice}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {VOICE_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="language">Sprache</Label>
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="de">Deutsch</SelectItem>
-                    <SelectItem value="en">Englisch</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="greeting">Begrüßungstext</Label>
-                  <span className="text-sm text-muted-foreground">
-                    {greetingCharCount}/500
-                  </span>
-                </div>
-                <Textarea
-                  id="greeting"
-                  value={greetingText}
-                  onChange={(e) => {
-                    setGreetingText(e.target.value)
-                    setGreetingCharCount(e.target.value.length)
-                  }}
-                  maxLength={500}
-                  placeholder="Guten Tag! Herzlich willkommen bei [Restaurant Name]. Wie kann ich Ihnen heute helfen?"
-                  className="min-h-[100px]"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Dieser Text wird verwendet, wenn die KI-Assistentin einen Anruf entgegennimmt.
-                </p>
-              </div>
-              <div className="flex gap-4">
-                <Button onClick={handleTestCall} variant="outline">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Test-Anruf starten
-                </Button>
-                <Button onClick={handleSaveVoiceAgent} disabled={loading}>
-                  <Save className="mr-2 h-4 w-4" />
-                  Speichern
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>

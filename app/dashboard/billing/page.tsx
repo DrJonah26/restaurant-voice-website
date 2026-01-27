@@ -8,11 +8,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-import { Check, Download, CreditCard, AlertCircle } from "lucide-react"
+import { Check, CreditCard, AlertCircle } from "lucide-react"
 import { STRIPE_PLANS } from "@/lib/stripe-plans"
 import { toast } from "sonner"
-import Link from "next/link"
-import { formatDate } from "@/lib/utils"
 
 const stripePlanBySubscriptionPlan = {
   trial: "basic",
@@ -37,31 +35,6 @@ export default function BillingPage() {
   const [usage, setUsage] = useState({ calls: 234, limit: 300 })
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
-
-  // Mock invoice data
-  const invoices = [
-    {
-      id: "inv_001",
-      date: "2024-01-15",
-      description: "Basic Plan - Januar 2024",
-      amount: 30,
-      status: "paid",
-    },
-    {
-      id: "inv_002",
-      date: "2023-12-15",
-      description: "Basic Plan - Dezember 2023",
-      amount: 30,
-      status: "paid",
-    },
-    {
-      id: "inv_003",
-      date: "2023-11-15",
-      description: "Basic Plan - November 2023",
-      amount: 30,
-      status: "paid",
-    },
-  ]
 
   useEffect(() => {
     const loadData = async () => {
@@ -314,53 +287,6 @@ const handleUpgrade = async (planKey: string) => {
         </CardContent>
       </Card>
 
-      {/* Invoice History */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Rechnungshistorie</CardTitle>
-          <CardDescription>
-            Alle Ihre bisherigen Rechnungen
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {invoices.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Noch keine Rechnungen vorhanden
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {invoices.map((invoice) => (
-                <div
-                  key={invoice.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <p className="font-medium">{invoice.description}</p>
-                      <Badge
-                        variant={
-                          invoice.status === "paid" ? "success" : "warning"
-                        }
-                      >
-                        {invoice.status === "paid" ? "Bezahlt" : "Ausstehend"}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {formatDate(invoice.date)} • {invoice.id}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <p className="font-bold">{invoice.amount}€</p>
-                    <Button variant="outline" size="icon">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   )
 }

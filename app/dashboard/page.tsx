@@ -266,28 +266,6 @@ export default function DashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Schnellaktionen</CardTitle>
-            <CardDescription>
-              Häufig verwendete Funktionen
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button className="w-full" variant="outline">
-              <Phone className="mr-2 h-4 w-4" />
-              Voice Agent testen
-            </Button>
-            <Link href="/dashboard/settings">
-              <Button className="w-full" variant="outline">
-                Einstellungen anpassen
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   )
 }

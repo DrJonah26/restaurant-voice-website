@@ -184,8 +184,13 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl border border-border shadow-sm">
+    <div className="relative min-h-screen overflow-hidden bg-background">
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(1600px_820px_at_50%_40%,_rgba(253,224,71,0.25),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1000px_520px_at_60%_60%,_rgba(250,204,21,0.18),_transparent_72%)]" />
+      </div>
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl border border-border shadow-sm">
         <CardHeader>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -419,11 +424,14 @@ export default function OnboardingPage() {
                 {showGuide && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Anrufweiterleitung in 3 Schritten</CardTitle>
+                      <CardTitle>Anleitung zur Weiterleitung einer Telefonnummer</CardTitle>
+                      <CardDescription>
+                        Geben Sie die untenstehenden Tastenkombinationen auf Ihrem Gerät ein.
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div>
-                        <p className="text-sm font-semibold text-muted-foreground">Ihre neue Nummer</p>
+                        <p className="text-sm font-semibold text-muted-foreground">Zielnummer</p>
                         <div className="flex items-center gap-3">
                           <p className="text-lg font-medium">
                             {provisionedNumber ?? "Noch nicht verfuegbar"}
@@ -439,33 +447,22 @@ export default function OnboardingPage() {
                           </Button>
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-sm font-semibold text-muted-foreground">Schritt 1</p>
-                        <p className="text-sm">
-                          Waehlen Sie Ihren Anbieter oder Ihr Telefonsystem und oeffnen Sie
-                          die Einstellungen fuer Rufumleitungen.
-                        </p>
+                      <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
+                        <div className="font-medium">Für alle Anrufe</div>
+                        <div>**21*Zielnummer#</div>
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-sm font-semibold text-muted-foreground">Schritt 2</p>
-                        <p className="text-sm">
-                          Aktivieren Sie eine bedingungslose Weiterleitung (immer) auf die neue Nummer.
-                        </p>
-                        <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
-                          <div className="font-medium">Beispiel (Mobilfunk, GSM)</div>
-                          <div>*21*NEUE_NUMMER#</div>
-                          <div>Deaktivieren: ##21#</div>
-                        </div>
+                      <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
+                        <div className="font-medium">Nur bei nicht besetzt</div>
+                        <div>**67*Zielnummer#</div>
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-sm font-semibold text-muted-foreground">Schritt 3</p>
-                        <p className="text-sm">
-                          Testen Sie die Weiterleitung, indem Sie Ihre alte Nummer anrufen.
-                        </p>
+                      <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
+                        <div className="font-medium">Nur bei nicht melden</div>
+                        <div>**61*Zielnummer#</div>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Hinweis: Die Codes koennen je nach Anbieter abweichen.
-                      </p>
+                      <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
+                        <div className="font-medium">Deaktivieren</div>
+                        <div>##21#</div>
+                      </div>
                     </CardContent>
                   </Card>
                 )}
@@ -491,7 +488,8 @@ export default function OnboardingPage() {
             )}
           </AnimatePresence>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }

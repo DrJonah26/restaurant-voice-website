@@ -57,7 +57,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2">
+    <div className="relative min-h-screen overflow-hidden bg-background">
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(1600px_820px_at_50%_40%,_rgba(253,224,71,0.25),_transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1000px_520px_at_60%_60%,_rgba(250,204,21,0.18),_transparent_72%)]" />
+      </div>
+      <div className="relative z-10 min-h-screen grid md:grid-cols-2">
       {/* Left Side - Image */}
       <div className="hidden md:block relative bg-gradient-to-br from-primary to-blue-600">
         <div className="absolute inset-0 bg-black/20" />
@@ -72,7 +77,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex items-center justify-center p-8 bg-background">
+      <div className="flex items-center justify-center p-8 bg-background/80">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold">Anmelden</CardTitle>
@@ -178,6 +183,7 @@ export default function LoginPage() {
             </div>
           </CardFooter>
         </Card>
+      </div>
       </div>
     </div>
   )

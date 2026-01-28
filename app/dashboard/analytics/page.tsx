@@ -302,7 +302,7 @@ export default function AnalyticsPage() {
                 <Line
                   type="monotone"
                   dataKey="calls"
-                  stroke="#3B82F6"
+                  stroke="#FDE68A"
                   strokeWidth={2}
                   name="Anrufe"
                 />
@@ -325,7 +325,7 @@ export default function AnalyticsPage() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="calls" fill="#3B82F6" name="Anrufe" />
+              <Bar dataKey="calls" fill="#FDE68A" name="Anrufe" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

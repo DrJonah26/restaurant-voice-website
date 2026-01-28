@@ -98,35 +98,40 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed top-0 left-0 z-50 h-full w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border transform transition-transform duration-300 md:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+    <div className="relative min-h-screen overflow-hidden bg-background">
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(2200px_1100px_at_40%_35%,_rgba(253,224,71,0.2),_transparent_72%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1500px_760px_at_45%_60%,_rgba(250,204,21,0.14),_transparent_75%)]" />
+      </div>
+      <div className="relative z-10 min-h-screen">
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
-            <h1 className="text-xl font-bold text-sidebar-foreground">JoydeAI</h1>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
+
+        {/* Sidebar */}
+        <aside
+          className={cn(
+            "fixed top-0 left-0 z-50 h-full w-64 bg-sidebar/80 backdrop-blur-md text-sidebar-foreground border-r border-sidebar-border transform transition-transform duration-300 md:translate-x-0",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          )}
+        >
+          <div className="flex flex-col h-full">
+            {/* Logo */}
+            <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
+              <h1 className="text-xl font-bold text-sidebar-foreground">JoydeAI</h1>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
@@ -211,7 +216,7 @@ export default function DashboardLayout({
             )}
           </div>
         </div>
-      </aside>
+        </aside>
 
       {/* Main Content */}
       <div className="md:ml-64">
@@ -232,6 +237,7 @@ export default function DashboardLayout({
 
         {/* Page Content */}
         <main className="p-4 md:p-8">{children}</main>
+      </div>
       </div>
     </div>
   )

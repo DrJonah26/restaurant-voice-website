@@ -58,12 +58,29 @@ export function HowItWorksSection() {
   const [duration, setDuration] = useState(75)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const togglePlay = () => {
+  const getWaveHeight = (index: number) => {
+    if (!isPlaying) {
+      return Math.round(Math.sin(index * 0.3) * 16 + 24)
+    }
+
+    return Math.round(12 + (Math.sin(index * 0.45 + currentTime * 2) + 1) * 20)
+  }
+
+  const togglePlay = async () => {
     const audio = audioRef.current
     if (!audio) return
 
     if (audio.paused) {
-      void audio.play()
+      try {
+        const playPromise = audio.play()
+        if (playPromise) {
+          await playPromise
+        }
+      } catch (error: any) {
+        if (error?.name !== "AbortError") {
+          console.error("Audio play failed", error)
+        }
+      }
     } else {
       audio.pause()
     }
@@ -223,9 +240,7 @@ export function HowItWorksSection() {
                           isPlaying ? 'bg-accent' : 'bg-muted-foreground/20'
                         }`}
                         style={{
-                          height: isPlaying 
-                            ? `${Math.random() * 40 + 12}px` 
-                            : `${Math.sin(i * 0.3) * 16 + 24}px`,
+                          height: `${getWaveHeight(i)}px`,
                         }}
                       />
                     ))}

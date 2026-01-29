@@ -86,18 +86,18 @@ export default function ResetPasswordPage() {
             <div className="bg-card border border-border p-8 rounded-2xl shadow-sm">
               <h2 className="text-4xl font-bold mb-4">Neues Passwort setzen</h2>
               <p className="text-xl opacity-90">
-                Waehle ein sicheres Passwort für dein Konto.
+                Wähle ein sicheres Passwort für dein Konto.
               </p>
             </div>
           </div>
         </div>
 
         {/* Right Side - Form */}
-        <div className="flex items-center justify-center p-8 bg-background/80">
+        <div className="flex items-center justify-center px-5 py-10 sm:p-8 bg-background/80">
           <Card className="w-full max-w-md border border-border shadow-sm">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold">Passwort aktualisieren</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-xl sm:text-2xl font-bold">Passwort aktualisieren</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 {checking
                   ? "Link wird geprüft..."
                   : hasSession
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
             </CardHeader>
             <CardContent>
               {hasSession ? (
-                <form onSubmit={handleReset} className="space-y-4">
+                <form onSubmit={handleReset} className="space-y-3 sm:space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="password">Neues Passwort</Label>
                     <Input
@@ -122,7 +122,7 @@ export default function ResetPasswordPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Passwort bestaetigen</Label>
+                    <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
                     <Input
                       id="confirmPassword"
                       type="password"

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
-import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
@@ -29,6 +28,7 @@ export default function SettingsPage() {
   const [restaurant, setRestaurant] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const countryPrefix = "+49"
 
   // Restaurant settings
   const [restaurantName, setRestaurantName] = useState("")
@@ -39,7 +39,7 @@ export default function SettingsPage() {
 
   // Phone settings
   const [phoneNumber, setPhoneNumber] = useState("")
-  const [callForwarding, setCallForwarding] = useState(false)
+  const [provisionedNumber, setProvisionedNumber] = useState<string | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -69,8 +69,8 @@ export default function SettingsPage() {
       setOpeningTime(restaurantData.opening_time || "09:00")
       setClosingTime(restaurantData.closing_time || "22:00")
       setClosedDays(restaurantData.closed_days || [])
-      setPhoneNumber(restaurantData.phone || "")
-      setCallForwarding(restaurantData.call_forwarding || false)
+      setPhoneNumber(stripCountryPrefix(restaurantData.phone_number || ""))
+      setProvisionedNumber(restaurantData.twilio_number || null)
     }
 
     loadData()
@@ -81,6 +81,17 @@ export default function SettingsPage() {
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     )
   }
+
+  const stripCountryPrefix = (value: string) => {
+    const trimmed = value.trim()
+    if (!trimmed) return ""
+    if (trimmed.startsWith(countryPrefix)) {
+      return trimmed.slice(countryPrefix.length).trim()
+    }
+    return trimmed
+  }
+
+  const normalizeLocalNumber = (value: string) => value.replace(/\s+/g, "")
 
   const handleSaveRestaurant = async () => {
     setLoading(true)
@@ -112,7 +123,9 @@ export default function SettingsPage() {
       const { error } = await supabase
         .from("practices")
         .update({
-          call_forwarding: callForwarding,
+          phone_number: phoneNumber
+            ? `${countryPrefix}${normalizeLocalNumber(phoneNumber)}`
+            : null,
         })
         .eq("id", restaurant.id)
 
@@ -123,6 +136,16 @@ export default function SettingsPage() {
       toast.error(error.message || "Fehler beim Speichern")
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleCopyNumber = async () => {
+    if (!provisionedNumber) return
+    try {
+      await navigator.clipboard.writeText(provisionedNumber)
+      toast.success("Nummer kopiert")
+    } catch (error: any) {
+      toast.error(error.message || "Kopieren fehlgeschlagen")
     }
   }
 
@@ -223,28 +246,70 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Telefon-Einstellungen</CardTitle>
               <CardDescription>
-                Verwalten Sie Ihre Telefonnummer und Weiterleitung
+                Verwalten Sie Ihre Telefonnummer und richten Sie die Weiterleitung ein
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Aktuelle Telefonnummer</Label>
-                <Input value={phoneNumber} disabled className="bg-muted" />
-                <p className="text-xs text-muted-foreground">
-                  Die Telefonnummer kann derzeit nicht geändert werden. Kontaktieren Sie den Support.
-                </p>
+                <Label htmlFor="phoneNumber">Ihre Telefonnummer</Label>
+                <div className="flex">
+                  <div className="flex items-center rounded-l-md border border-border bg-muted px-3 text-sm text-muted-foreground">
+                    {countryPrefix}
+                  </div>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="30 1234 5678"
+                    className="rounded-l-none"
+                  />
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Weiterleitung aktivieren</Label>
+              <div className="rounded-lg border border-border bg-muted/10 p-4">
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">
+                    Anleitung zur Weiterleitung einer Telefonnummer
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    Anrufe werden an Ihre KI-Assistentin weitergeleitet
+                    Geben Sie die untenstehenden Tastenkombinationen auf Ihrem Gerät ein.
                   </p>
                 </div>
-                <Switch
-                  checked={callForwarding}
-                  onCheckedChange={setCallForwarding}
-                />
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <p className="text-xs font-semibold text-muted-foreground">Zielnummer</p>
+                    <div className="mt-1 flex items-center gap-3">
+                      <p className="text-lg font-medium">
+                        {provisionedNumber ?? "Noch nicht verfuegbar"}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopyNumber}
+                        disabled={!provisionedNumber}
+                      >
+                        Kopieren
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="rounded-md border border-border bg-background p-3 text-sm">
+                    <div className="font-medium">Für alle Anrufe</div>
+                    <div>**21*Zielnummer#</div>
+                  </div>
+                  <div className="rounded-md border border-border bg-background p-3 text-sm">
+                    <div className="font-medium">Nur bei nicht besetzt</div>
+                    <div>**67*Zielnummer#</div>
+                  </div>
+                  <div className="rounded-md border border-border bg-background p-3 text-sm">
+                    <div className="font-medium">Nur bei nicht melden</div>
+                    <div>**61*Zielnummer#</div>
+                  </div>
+                  <div className="rounded-md border border-border bg-background p-3 text-sm">
+                    <div className="font-medium">Deaktivieren</div>
+                    <div>##21#</div>
+                  </div>
+                </div>
               </div>
               <Button onClick={handleSavePhone} disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />

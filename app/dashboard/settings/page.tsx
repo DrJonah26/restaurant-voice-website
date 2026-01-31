@@ -280,7 +280,7 @@ export default function SettingsPage() {
                     <p className="text-xs font-semibold text-muted-foreground">Zielnummer</p>
                     <div className="mt-1 flex items-center gap-3">
                       <p className="text-lg font-medium">
-                        {provisionedNumber ?? "Noch nicht verfuegbar"}
+                        {provisionedNumber ?? "Noch nicht verfügbar"}
                       </p>
                       <Button
                         type="button"

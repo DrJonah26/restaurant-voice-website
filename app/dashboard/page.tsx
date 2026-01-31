@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Phone, Calendar } from "lucide-react"
 import Link from "next/link"
-import { formatDateTime } from "@/lib/utils"
+import { formatDate, formatDateTime } from "@/lib/utils"
+import { TRIAL_DURATION_DAYS } from "@/lib/stripe-plans"
 
 const toDateString = (value: Date) => {
   const year = value.getFullYear()
@@ -26,6 +27,8 @@ export default function DashboardPage() {
     reservationsToday: 0,
     reservationsThisMonth: 0,
   })
+  const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null)
+  const [trialEndDate, setTrialEndDate] = useState<Date | null>(null)
   const [recentReservations, setRecentReservations] = useState<any[]>([])
   const supabase = createClient()
 
@@ -53,10 +56,28 @@ export default function DashboardPage() {
         return
       }
 
-      setRestaurant(practices)
-      const practiceId = practices.practice_id ?? practices.id
-
       const now = new Date()
+      setRestaurant(practices)
+      let trialEnd: Date | null = null
+      if (practices.subscription_plan === "trial") {
+        if (practices.trial_ends_at) {
+          trialEnd = new Date(practices.trial_ends_at)
+        } else if (practices.trial_started_at) {
+          trialEnd = new Date(practices.trial_started_at)
+          trialEnd.setDate(trialEnd.getDate() + TRIAL_DURATION_DAYS)
+        }
+      }
+
+      if (trialEnd) {
+        const msLeft = trialEnd.getTime() - now.getTime()
+        const daysLeft = Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)))
+        setTrialDaysLeft(daysLeft)
+        setTrialEndDate(trialEnd)
+      } else {
+        setTrialDaysLeft(null)
+        setTrialEndDate(null)
+      }
+      const practiceId = practices.practice_id ?? practices.id
       const todayStart = new Date(
         now.getFullYear(),
         now.getMonth(),
@@ -146,6 +167,26 @@ export default function DashboardPage() {
           Hier ist eine Übersicht über Ihre Aktivitäten.
         </p>
       </div>
+
+      {trialDaysLeft !== null && (
+        <Card className="border-primary/40 bg-primary/5">
+          <CardHeader>
+            <CardTitle>Testphase aktiv</CardTitle>
+            <CardDescription>
+              Noch {trialDaysLeft} {trialDaysLeft === 1 ? "Tag" : "Tage"} im
+              kostenlosen Test.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="text-sm text-muted-foreground">
+              {trialEndDate ? `Endet am ${formatDate(trialEndDate)}.` : null}
+            </div>
+            <Link href="/dashboard/billing">
+              <Button>Plan auswählen</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

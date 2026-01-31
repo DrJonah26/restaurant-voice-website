@@ -12,14 +12,14 @@ const plans = [
     period: "/ 7 Tage testen",
     description: "Ideal für kleine Restaurants und den schnellen Einstieg.",
     features: [
-      "300 Anrufe/Monat",
+      "50 Anrufe/Monat",
       "Automatische Reservierungen",
       "24/7 Erreichbarkeit",
       "E-Mail Benachrichtigungen",
-      "Basis Analytics",
+      "Dashboard mit Übersicht, Einstellungen und Analyse",
       "Perfekt für Anrufe außerhalb der Öffnungszeiten",
     ],
-    cta: "Jezzt kostenlos testen",
+    cta: "Plan wählen",
     subPrice: "30€ / Monat danach",
     highlighted: false,
   },
@@ -32,11 +32,10 @@ const plans = [
       "700 Anrufe/Monat",
       "Automatische Reservierungen",
       "24/7 Erreichbarkeit",
-      "E-Mail & SMS Benachrichtigungen",
-      "Erweiterte Analytics",
+      "E-Mail Benachrichtigungen",
+      "Dashboard mit  Übersicht, Einstellungen und erweiterter Analyse",
       "Priorität Support",
-      "Custom Voice Agent",
-      "KI übernimmt dauerhaft",
+      "KI kann kann dauerhaft übernehmen",
     ],
     cta: "Plan wählen",
     highlighted: true,
@@ -46,20 +45,16 @@ const plans = [
     price: "Individuell",
     period: "",
     description: "Für große Restaurants oder individuelle Anforderungen.",
-    features: [
-      "Unbegrenzte Anrufe",
-      "Alle Professional Features",
-      "Dedicated Account Manager",
-      "Custom Integration",
-      "SLA Garantie",
-    ],
+    features: [],
     cta: "Kontaktieren Sie uns",
     highlighted: false,
-    helper: "Sie benötigen mehr Anrufe? Kontaktieren Sie uns für ein individuelles Angebot.",
+    helper: "Sie benötigen mehr Anrufe und Features? Sprechen sie uns direkt auf ihre Wünsche an!",
   },
 ]
 
-export function PricingSection() {
+export function PricingSection({ ctaHref }: { ctaHref?: string }) {
+  const resolvedCtaHref = ctaHref ?? "/auth/signup"
+
   return (
     <ScrollReveal
       as="section"
@@ -87,7 +82,7 @@ export function PricingSection() {
           {plans.map((plan, index) => (
             <div
               key={plan.name}
-              className={`reveal-item relative rounded-3xl p-8 ${
+              className={`reveal-item relative flex h-full flex-col rounded-3xl p-8 ${
                 plan.highlighted
                   ? "bg-card border-2 border-accent"
                   : "bg-card border border-border"
@@ -114,30 +109,39 @@ export function PricingSection() {
                 <p className="mt-3 text-muted-foreground">
                   <RevealWords text={plan.description} startDelay={160} step={30} />
                 </p>
+                {plan.helper ? (
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    <RevealWords text={plan.helper} startDelay={160} step={30} />
+                  </p>
+                ) : null}
               </div>
 
-              <ul className="space-y-4 mb-8">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-foreground">
-                      <RevealWords text={feature} startDelay={120} step={28} />
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              {plan.features.length > 0 ? (
+                <ul className="space-y-4 mb-8 flex-1">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-3">
+                      <Check className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground">
+                        <RevealWords text={feature} startDelay={120} step={28} />
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="mb-8 flex-1" />
+              )}
 
               {plan.name === "Custom" ? (
                 <Button
-                  className="w-full bg-secondary text-foreground hover:bg-secondary/80 border border-border"
+                  className="w-full bg-secondary text-foreground hover:bg-secondary/80 border border-border mt-auto"
                   size="lg"
                 >
                   {plan.cta}
                 </Button>
               ) : (
-                <Link href="/auth/signup">
+                <Link href={resolvedCtaHref}>
                   <Button
-                    className={`w-full ${
+                    className={`w-full mt-auto ${
                       plan.highlighted
                         ? "bg-primary text-primary-foreground hover:bg-primary/90"
                         : "bg-secondary text-foreground hover:bg-secondary/80 border border-border"
@@ -148,12 +152,6 @@ export function PricingSection() {
                   </Button>
                 </Link>
               )}
-
-              {plan.helper ? (
-                <p className="mt-4 text-sm text-muted-foreground">
-                  <RevealWords text={plan.helper} startDelay={160} step={30} />
-                </p>
-              ) : null}
             </div>
           ))}
         </div>

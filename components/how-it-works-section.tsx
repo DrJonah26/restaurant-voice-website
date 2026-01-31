@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from "react"
 import { useState, useRef, useEffect } from "react"
-import { Play, Pause, Volume2, Mic, Phone, Settings, Zap } from "lucide-react"
+import { Play, Pause, Volume2, Mic, Phone, Settings, Zap, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollReveal } from "@/components/scroll-reveal"
 import { RevealWords } from "@/components/reveal-words"
@@ -84,6 +84,16 @@ export function HowItWorksSection() {
     } else {
       audio.pause()
     }
+  }
+
+  const resetAudio = () => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    audio.pause()
+    audio.currentTime = 0
+    setCurrentTime(0)
+    setIsPlaying(false)
   }
 
   const formatTime = (time: number) => {
@@ -228,6 +238,15 @@ export function HowItWorksSection() {
                       </div>
                     </div>
 
+                    <Button
+                      onClick={resetAudio}
+                      size="icon"
+                      variant="ghost"
+                      className="h-10 w-10 flex-shrink-0"
+                      aria-label="Audio von vorn starten"
+                    >
+                      <RotateCcw className="w-4 h-4 text-muted-foreground" />
+                    </Button>
                     <Volume2 className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                   </div>
 

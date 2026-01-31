@@ -11,7 +11,6 @@ import {
   BarChart3,
   CreditCard,
   LogOut,
-  User,
   Menu,
   X,
 } from "lucide-react"
@@ -27,6 +26,8 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { TrialExpiredScreen } from "@/components/trial-expired-screen"
+import { TRIAL_CALLS_LIMIT, TRIAL_DURATION_DAYS } from "@/lib/stripe-plans"
 
 const navigation = [
   { name: "Übersicht", href: "/dashboard", icon: LayoutDashboard },
@@ -47,6 +48,10 @@ export default function DashboardLayout({
   const [restaurant, setRestaurant] = useState<any>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [trialExpired, setTrialExpired] = useState(false)
+  const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null)
+  const [accessChecked, setAccessChecked] = useState(false)
+  const [subscriptionExpired, setSubscriptionExpired] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
@@ -58,6 +63,7 @@ export default function DashboardLayout({
 
       if (!user) {
         router.push("/auth/login")
+        setAccessChecked(true)
         return
       }
 
@@ -72,10 +78,62 @@ export default function DashboardLayout({
 
       if (!restaurantData?.onboarding_completed) {
         router.push("/onboarding")
+        setAccessChecked(true)
         return
       }
 
+      const now = new Date()
+      const paidPlans = ["starter", "pro", "enterprise"]
+      const isPaidPlan = paidPlans.includes(restaurantData.subscription_plan)
+      const isSubscriptionExpired = restaurantData.subscription_status === "expired"
+      let resolvedTrialEndsAt: Date | null = null
+
+      if (restaurantData.trial_ends_at) {
+        resolvedTrialEndsAt = new Date(restaurantData.trial_ends_at)
+      } else if (restaurantData.trial_started_at) {
+        resolvedTrialEndsAt = new Date(restaurantData.trial_started_at)
+        resolvedTrialEndsAt.setDate(
+          resolvedTrialEndsAt.getDate() + TRIAL_DURATION_DAYS
+        )
+      }
+
+      if (restaurantData.subscription_plan === "trial" && !resolvedTrialEndsAt) {
+        const trialStart = now
+        resolvedTrialEndsAt = new Date(
+          trialStart.getTime() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000
+        )
+        await supabase
+          .from("practices")
+          .update({
+            trial_started_at: trialStart.toISOString(),
+            trial_ends_at: resolvedTrialEndsAt.toISOString(),
+            calls_limit: restaurantData.calls_limit ?? TRIAL_CALLS_LIMIT,
+          })
+          .eq("user_id", user.id)
+        restaurantData.trial_started_at = trialStart.toISOString()
+        restaurantData.trial_ends_at = resolvedTrialEndsAt.toISOString()
+        if (!restaurantData.calls_limit) {
+          restaurantData.calls_limit = TRIAL_CALLS_LIMIT
+        }
+      }
+
+      const isTrialExpired =
+        !!resolvedTrialEndsAt && now > resolvedTrialEndsAt && !isPaidPlan
+
+      if (isTrialExpired && restaurantData.subscription_plan === "trial") {
+        await supabase
+          .from("practices")
+          .update({ subscription_plan: "expired", subscription_status: "expired" })
+          .eq("user_id", user.id)
+        restaurantData.subscription_plan = "expired"
+        restaurantData.subscription_status = "expired"
+      }
+
+      setTrialEndsAt(resolvedTrialEndsAt)
+      setTrialExpired(isTrialExpired)
+      setSubscriptionExpired(isSubscriptionExpired || isTrialExpired)
       setRestaurant(restaurantData)
+      setAccessChecked(true)
     }
 
     checkUser()
@@ -95,6 +153,25 @@ export default function DashboardLayout({
       .join("")
       .toUpperCase()
       .slice(0, 2)
+  }
+
+  if (!accessChecked) {
+    return null
+  }
+
+  if ((trialExpired || subscriptionExpired) && pathname !== "/dashboard/billing") {
+    const title = trialExpired ? "Testzeitraum abgelaufen" : "Abo abgelaufen"
+    const description = trialExpired
+      ? "Ihr 7-Tage-Test ist beendet. Bitte wählen Sie einen Plan, um weiter Zugriff zu erhalten."
+      : "Ihre Zahlung ist nicht aktiv. Bitte wählen Sie einen Plan, um wieder Zugriff zu erhalten."
+    return (
+      <TrialExpiredScreen
+        trialEndsAt={trialEndsAt}
+        ctaHref="/dashboard/billing"
+        title={title}
+        description={description}
+      />
+    )
   }
 
   return (
@@ -182,11 +259,6 @@ export default function DashboardLayout({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Mein Konto</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profil</span>
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />

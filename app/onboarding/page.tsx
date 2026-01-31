@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { createClient } from "@/lib/supabase/client"
+import { TRIAL_CALLS_LIMIT, TRIAL_DURATION_DAYS } from "@/lib/stripe-plans"
 import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect } from "react"
@@ -112,7 +113,7 @@ export default function OnboardingPage() {
             user_id: user.id,
             name: restaurantName,
             email: restaurantEmail,
-            phone_number: restaurantPhone || null,
+            phone_number: restaurantPhone,
             opening_time: openingTime,
             closing_time: closingTime,
             max_capacity: maxCapacity[0],
@@ -145,9 +146,20 @@ export default function OnboardingPage() {
 
       setProvisionedNumber(result.phoneNumber ?? null)
 
+      const trialStart = new Date()
+      const trialEnd = new Date(
+        trialStart.getTime() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000
+      )
+
       const { error: completionError } = await supabase
         .from("practices")
-        .update({ onboarding_completed: true })
+        .update({
+          onboarding_completed: true,
+          subscription_plan: "trial",
+          trial_started_at: trialStart.toISOString(),
+          trial_ends_at: trialEnd.toISOString(),
+          calls_limit: TRIAL_CALLS_LIMIT,
+        })
         .eq("user_id", user.id)
 
       if (completionError) throw completionError
@@ -262,13 +274,14 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="restaurantPhone">Telefon (optional)</Label>
+                    <Label htmlFor="restaurantPhone">Telefon *</Label>
                     <Input
                       id="restaurantPhone"
                       type="tel"
                       value={restaurantPhone}
                       onChange={(e) => setRestaurantPhone(e.target.value)}
-                      placeholder="+44 20 1234 5678"
+                      placeholder="+49 30 1234 5678"
+                      required
                     />
                   </div>
                 </div>
@@ -279,7 +292,7 @@ export default function OnboardingPage() {
                   <Button
                     onClick={handleNext}
                     className="flex-1"
-                    disabled={!restaurantName || !restaurantEmail}
+                    disabled={!restaurantName || !restaurantEmail || !restaurantPhone}
                   >
                     Weiter
                   </Button>
@@ -434,7 +447,7 @@ export default function OnboardingPage() {
                         <p className="text-sm font-semibold text-muted-foreground">Zielnummer</p>
                         <div className="flex items-center gap-3">
                           <p className="text-lg font-medium">
-                            {provisionedNumber ?? "Noch nicht verfuegbar"}
+                            {provisionedNumber ?? "Noch nicht verfügbar"}
                           </p>
                           <Button
                             type="button"

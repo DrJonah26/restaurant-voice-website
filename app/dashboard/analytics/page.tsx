@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -48,6 +49,26 @@ export default function AnalyticsPage() {
   const supabase = createClient()
   const [practiceId, setPracticeId] = useState<string | null>(null)
 
+  const formatInputDate = (value: Date) => {
+    const year = value.getFullYear()
+    const month = String(value.getMonth() + 1).padStart(2, "0")
+    const day = String(value.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
+  }
+
+  const parseInputDate = (value: string) => {
+    const [year, month, day] = value.split("-").map(Number)
+    if (!year || !month || !day) return null
+    return new Date(year, month - 1, day)
+  }
+
+  const [customStart, setCustomStart] = useState(() => {
+    const now = new Date()
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6)
+    return formatInputDate(start)
+  })
+  const [customEnd, setCustomEnd] = useState(() => formatInputDate(new Date()))
+
   const [stats, setStats] = useState({
     totalCalls: 0,
     successfulBookings: 0,
@@ -70,21 +91,48 @@ export default function AnalyticsPage() {
   const startOfDay = (value: Date) =>
     new Date(value.getFullYear(), value.getMonth(), value.getDate())
 
+  const endOfDay = (value: Date) =>
+    new Date(value.getFullYear(), value.getMonth(), value.getDate(), 23, 59, 59, 999)
+
   const formatDateKey = (value: Date) => value.toISOString().slice(0, 10)
 
   const getTimeRangeBounds = () => {
     const now = new Date()
-    const end = now
+    let end = now
     let start = startOfDay(now)
 
     if (timeRange === "week") {
       start = startOfDay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6))
     } else if (timeRange === "month") {
       start = startOfDay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29))
+    } else if (timeRange === "custom") {
+      const parsedStart = parseInputDate(customStart) ?? now
+      const parsedEnd = parseInputDate(customEnd) ?? now
+      const startCandidate = startOfDay(parsedStart)
+      const endCandidate = endOfDay(parsedEnd)
+
+      if (startCandidate <= endCandidate) {
+        return { start: startCandidate, end: endCandidate }
+      }
+
+      return { start: startOfDay(parsedEnd), end: endOfDay(parsedStart) }
     }
 
     return { start, end }
   }
+
+  const timeRangeLabel = useMemo(() => {
+    if (timeRange === "today") return "Heute"
+    if (timeRange === "month") return "Letzte 30 Tage"
+    if (timeRange === "custom") {
+      const startValue = parseInputDate(customStart)
+      const endValue = parseInputDate(customEnd)
+      if (!startValue || !endValue) return "Benutzerdefiniert"
+      const formatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" })
+      return `${formatter.format(startValue)} – ${formatter.format(endValue)}`
+    }
+    return "Letzte 7 Tage"
+  }, [customEnd, customStart, timeRange])
 
   useEffect(() => {
     const loadData = async () => {
@@ -186,7 +234,7 @@ export default function AnalyticsPage() {
     }
 
     loadData()
-  }, [router, supabase, timeRange])
+  }, [router, supabase, timeRange, customStart, customEnd])
 
   useEffect(() => {
     if (!isCallLogsOpen || !practiceId) return
@@ -239,17 +287,39 @@ export default function AnalyticsPage() {
           <Button variant="outline" onClick={() => setIsCallLogsOpen(true)}>
             Call-Logs ansehen
           </Button>
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">Heute</SelectItem>
-              <SelectItem value="week">Diese Woche</SelectItem>
-              <SelectItem value="month">Dieser Monat</SelectItem>
-              <SelectItem value="custom">Benutzerdefiniert</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={timeRange} onValueChange={setTimeRange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Heute</SelectItem>
+                <SelectItem value="week">Diese Woche</SelectItem>
+                <SelectItem value="month">Dieser Monat</SelectItem>
+                <SelectItem value="custom">Benutzerdefiniert</SelectItem>
+              </SelectContent>
+            </Select>
+            {timeRange === "custom" ? (
+              <div className="flex flex-wrap items-center gap-2 rounded-md border border-border/60 bg-background/60 px-3 py-2">
+                <span className="text-xs text-muted-foreground">Von</span>
+                <Input
+                  type="date"
+                  value={customStart}
+                  onChange={(event) => setCustomStart(event.target.value)}
+                  className="h-8 w-[140px]"
+                  aria-label="Startdatum"
+                />
+                <span className="text-xs text-muted-foreground">Bis</span>
+                <Input
+                  type="date"
+                  value={customEnd}
+                  onChange={(event) => setCustomEnd(event.target.value)}
+                  className="h-8 w-[140px]"
+                  aria-label="Enddatum"
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -263,7 +333,7 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalCalls}</div>
             <p className="text-xs text-muted-foreground">
-              Zeitraum: {timeRange === "today" ? "Heute" : timeRange === "month" ? "Letzte 30 Tage" : "Letzte 7 Tage"}
+              Zeitraum: {timeRangeLabel}
             </p>
           </CardContent>
         </Card>

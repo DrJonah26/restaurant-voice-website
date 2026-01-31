@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const { data: practice, error: practiceError } = await supabase
       .from("practices")
-      .select("id, stripe_customer_id")
+      .select("id, stripe_customer_id, stripe_subscription_id")
       .eq("user_id", user.id)
       .single()
 
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     let stripeCustomerId = practice.stripe_customer_id as string | null
+    const existingSubscriptionId = practice.stripe_subscription_id as string | null
 
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
@@ -56,6 +57,14 @@ export async function POST(request: NextRequest) {
         .from("practices")
         .update({ stripe_customer_id: stripeCustomerId })
         .eq("id", practice.id)
+    }
+
+    if (existingSubscriptionId) {
+      try {
+        await stripe.subscriptions.del(existingSubscriptionId)
+      } catch (cancelError) {
+        console.warn("Failed to cancel existing subscription:", cancelError)
+      }
     }
 
     // Create Stripe Checkout Session

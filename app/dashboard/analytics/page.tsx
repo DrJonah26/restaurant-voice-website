@@ -160,26 +160,26 @@ export default function AnalyticsPage() {
       const startIso = start.toISOString()
       const endIso = end.toISOString()
 
-      setPracticeId(restaurantData.id)
+      const restaurantId = restaurantData.id
+      setPracticeId(restaurantId)
 
       const [callsResult, reservationsResult, callLogsResult] = await Promise.all([
         supabase
           .from("call_logs")
           .select("id", { count: "exact", head: true })
-          .eq("practice_id", restaurantData.id)
+          .eq("practice_id", restaurantId)
           .gte("started_at", startIso)
           .lte("started_at", endIso),
         supabase
           .from("reservations")
           .select("id", { count: "exact", head: true })
-          .eq("practice_id", practiceId)
-          .in("status", ["confirmed", "completed"])
+          .eq("practice_id", restaurantId)
           .gte("created_at", startIso)
           .lte("created_at", endIso),
         supabase
           .from("call_logs")
           .select("started_at")
-          .eq("practice_id", restaurantData.id)
+          .eq("practice_id", restaurantId)
           .gte("started_at", startIso)
           .lte("started_at", endIso),
       ])
@@ -340,14 +340,14 @@ export default function AnalyticsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Erfolgreiche Buchungen</CardTitle>
+            <CardTitle className="text-sm font-medium">Neue Buchungen</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.successfulBookings}</div>
             <p className="text-xs text-muted-foreground">
               {stats.totalCalls > 0
-                ? `${Math.round((stats.successfulBookings / stats.totalCalls) * 100)}% Erfolgsrate`
+                ? `${Math.round((stats.successfulBookings / stats.totalCalls) * 100)}% Buchungsrate`
                 : "Noch keine Anrufe"}
             </p>
           </CardContent>

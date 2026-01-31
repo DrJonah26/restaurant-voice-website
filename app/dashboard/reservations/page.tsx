@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Switch } from "@/components/ui/switch"
 import {
   Select,
   SelectContent,
@@ -32,6 +33,7 @@ export default function ReservationsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [dateFilter, setDateFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [hidePast, setHidePast] = useState(true)
   const [pageSize, setPageSize] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
   const [isHydrated, setIsHydrated] = useState(false)
@@ -82,6 +84,7 @@ export default function ReservationsPage() {
 
   useEffect(() => {
     let filtered = [...reservations]
+    const now = new Date()
 
     // Search filter
     if (searchQuery) {
@@ -92,9 +95,16 @@ export default function ReservationsPage() {
       )
     }
 
+    // Hide past reservations
+    if (hidePast) {
+      filtered = filtered.filter((r) => {
+        const resDate = new Date(`${r.date}T${r.time || "00:00:00"}`)
+        return resDate >= now
+      })
+    }
+
     // Date filter
     if (dateFilter !== "all") {
-      const now = new Date()
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       const weekStart = new Date(today)
       weekStart.setDate(today.getDate() - today.getDay())
@@ -119,7 +129,7 @@ export default function ReservationsPage() {
 
     setFilteredReservations(filtered)
     setCurrentPage(1)
-  }, [searchQuery, dateFilter, statusFilter, reservations])
+  }, [searchQuery, dateFilter, statusFilter, hidePast, reservations])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -188,15 +198,19 @@ export default function ReservationsPage() {
           <CardTitle>Filter & Suche</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-5">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Nach Name oder Telefon suchen..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="bg-background border-input backdrop-blur-0 pr-9"
               />
+            </div>
+            <div className="flex h-10 items-center justify-between gap-3 rounded-md border border-input bg-background px-3">
+              <span className="text-sm text-muted-foreground">Vergangene ausblenden</span>
+              <Switch checked={hidePast} onCheckedChange={setHidePast} />
             </div>
             {isHydrated ? (
               <Select value={dateFilter} onValueChange={setDateFilter}>

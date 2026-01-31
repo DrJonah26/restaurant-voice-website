@@ -126,8 +126,11 @@ export default function BillingPage() {
     currentPlan === "trial"
       ? FREE_TRIAL_PLAN
       : STRIPE_PLANS[currentPlan as keyof typeof STRIPE_PLANS]
-  const usagePercentage =
-    usage.limit > 0 ? (usage.calls / usage.limit) * 100 : 0
+  const isLimitSet = usage.limit > 0
+  const usagePercentage = isLimitSet ? (usage.calls / usage.limit) * 100 : 0
+  const isOverLimit = isLimitSet && usage.calls > usage.limit
+  const isNearLimit = isLimitSet && !isOverLimit && usagePercentage >= 80
+  const usageProgress = isLimitSet ? Math.min(100, usagePercentage) : 0
   const trialDaysLeft =
     currentPlan === "trial" && trialEndDate
       ? Math.max(
@@ -312,13 +315,21 @@ const handleUpgrade = async (planKey: string) => {
             <div className="text-xs text-muted-foreground mb-2">
               {usage.limit ? "Monatslimit" : "Kein Limit gesetzt"}
             </div>
-            <Progress value={usagePercentage} className="h-2" />
-            {usagePercentage > 80 && (
+            <Progress value={usageProgress} className="h-2" />
+            {isOverLimit ? (
+              <div className="mt-2 flex items-center gap-3 text-xs">
+                <p className="flex items-center gap-1 text-destructive">
+                  <AlertCircle className="h-3 w-3" />
+                  Sie haben ihr monatliches Limit überschritten. Aktuell übernimmt der
+                  KI-Assistent keine Anrufe für sie!
+                </p>
+              </div>
+            ) : isNearLimit ? (
               <p className="text-xs text-yellow-600 mt-2 flex items-center gap-1">
                 <AlertCircle className="h-3 w-3" />
                 Sie nähern sich Ihrem Limit. Erwägen Sie ein Upgrade.
               </p>
-            )}
+            ) : null}
           </div>
           <div>
             <h4 className="font-semibold mb-3">Plan-Features:</h4>

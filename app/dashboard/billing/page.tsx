@@ -51,6 +51,7 @@ export default function BillingPage() {
   const [trialExpired, setTrialExpired] = useState(false)
   const [trialEndDate, setTrialEndDate] = useState<Date | null>(null)
   const [subscriptionEndsAt, setSubscriptionEndsAt] = useState<Date | null>(null)
+  const [subscriptionExpired, setSubscriptionExpired] = useState(false)
   const [subscriptionCancelAtPeriodEnd, setSubscriptionCancelAtPeriodEnd] =
     useState(false)
   const supabase = createClient()
@@ -98,12 +99,19 @@ export default function BillingPage() {
       const renewalDate = restaurantData.subscription_ends_at
         ? new Date(restaurantData.subscription_ends_at)
         : null
+      const subscriptionExpiredByDate =
+        !!renewalDate &&
+        new Date() > renewalDate &&
+        restaurantData.subscription_plan !== "trial"
       const cancelAtPeriodEnd = !!restaurantData.subscription_cancel_at_period_end
       const expired =
         !!trialEnd && new Date() > trialEnd && !isPaidPlan
       setTrialExpired(expired)
       setTrialEndDate(trialEnd)
       setSubscriptionEndsAt(renewalDate)
+      setSubscriptionExpired(
+        restaurantData.subscription_status === "expired" || subscriptionExpiredByDate
+      )
       setSubscriptionCancelAtPeriodEnd(cancelAtPeriodEnd)
       const planKey = getStripePlanKey(restaurantData.subscription_plan)
       const resolvedPlan =
@@ -144,14 +152,15 @@ export default function BillingPage() {
     ? subscriptionEndsAt.toLocaleDateString("de-DE")
     : null
   const showStatusBadge = !subscriptionCancelAtPeriodEnd
-  const statusBadgeVariant = trialExpired
+  const accessExpired = trialExpired || subscriptionExpired
+  const statusBadgeVariant = accessExpired
     ? "destructive"
     : subscriptionCancelAtPeriodEnd
       ? "secondary"
       : currentPlan === "professional"
         ? "default"
         : "secondary"
-  const statusBadgeLabel = trialExpired
+  const statusBadgeLabel = accessExpired
     ? "Abgelaufen"
     : subscriptionCancelAtPeriodEnd
       ? cancelDateLabel
@@ -248,22 +257,24 @@ const handleUpgrade = async (planKey: string) => {
         </p>
       </div>
 
-      {trialExpired && (
+      {accessExpired && (
         <Card className="border-destructive/40 bg-destructive/5">
           <CardHeader>
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
-              <CardTitle>Testzeitraum abgelaufen</CardTitle>
+              <CardTitle>Abo abgelaufen</CardTitle>
             </div>
             <CardDescription>
-              Bitte wählen Sie einen Plan, um wieder Zugriff zu erhalten.
+              Ihr Abonnement ist abgelaufen. Bitte erneuern Sie es, um wieder Zugriff zu erhalten.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="text-sm text-muted-foreground">
-              {trialEndDate
-                ? `Test endete am ${trialEndDate.toLocaleDateString("de-DE")}.`
-                : null}
+              {subscriptionEndsAt
+                ? `Abo endete am ${subscriptionEndsAt.toLocaleDateString("de-DE")}.`
+                : trialEndDate
+                  ? `Test endete am ${trialEndDate.toLocaleDateString("de-DE")}.`
+                  : null}
             </div>
             <Button
               onClick={() =>
@@ -279,6 +290,7 @@ const handleUpgrade = async (planKey: string) => {
       )}
 
       {/* Current Plan */}
+      {!accessExpired && (
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -291,7 +303,7 @@ const handleUpgrade = async (planKey: string) => {
                       trialDaysLeft === 1 ? "Tag" : "Tage"
                     }`
                   : ""}
-                {trialDaysLeft === null && subscriptionEndsAt
+                {trialDaysLeft === null && subscriptionEndsAt && !subscriptionExpired
                   ? subscriptionCancelAtPeriodEnd
                     ? ` · läuft aus am ${subscriptionEndsAt.toLocaleDateString("de-DE")}`
                     : ` · wird erneut am ${subscriptionEndsAt.toLocaleDateString("de-DE")}`
@@ -368,6 +380,7 @@ const handleUpgrade = async (planKey: string) => {
           )}
         </CardFooter>
       </Card>
+      )}
 
       {/* Plan Selection */}
       <div id="plan-selection">

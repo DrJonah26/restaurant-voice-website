@@ -85,7 +85,16 @@ export default function DashboardLayout({
       const now = new Date()
       const paidPlans = ["starter", "pro", "enterprise"]
       const isPaidPlan = paidPlans.includes(restaurantData.subscription_plan)
-      const isSubscriptionExpired = restaurantData.subscription_status === "expired"
+      const subscriptionEndsAt = restaurantData.subscription_ends_at
+        ? new Date(restaurantData.subscription_ends_at)
+        : null
+      const isSubscriptionExpiredByDate =
+        !!subscriptionEndsAt &&
+        now > subscriptionEndsAt &&
+        restaurantData.subscription_plan !== "trial"
+      const isSubscriptionExpired =
+        restaurantData.subscription_status === "expired" ||
+        isSubscriptionExpiredByDate
       let resolvedTrialEndsAt: Date | null = null
 
       if (restaurantData.trial_ends_at) {
@@ -127,6 +136,20 @@ export default function DashboardLayout({
           .eq("user_id", user.id)
         restaurantData.subscription_plan = "expired"
         restaurantData.subscription_status = "expired"
+      }
+
+      if (isSubscriptionExpiredByDate && restaurantData.subscription_status !== "expired") {
+        await supabase
+          .from("practices")
+          .update({
+            subscription_plan: "expired",
+            subscription_status: "expired",
+            calls_limit: null,
+          })
+          .eq("user_id", user.id)
+        restaurantData.subscription_plan = "expired"
+        restaurantData.subscription_status = "expired"
+        restaurantData.calls_limit = null
       }
 
       setTrialEndsAt(resolvedTrialEndsAt)

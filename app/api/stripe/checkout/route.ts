@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     if (existingSubscriptionId) {
       try {
-        await stripe.subscriptions.del(existingSubscriptionId)
+        await stripe.subscriptions.cancel(existingSubscriptionId)
       } catch (cancelError) {
         console.warn("Failed to cancel existing subscription:", cancelError)
       }

@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     const purchasedNumber = await twilioClient.incomingPhoneNumbers.create({
       phoneNumber: selectedNumber,
       voiceUrl: `${VOICE_AGENT_URL}/incoming-call?practice_id=${practiceId}`,
-      voiceMethod: "POST",
+      voiceMethod: "GET",
       friendlyName: `${practice.name} - Voice AI`,
     })
 

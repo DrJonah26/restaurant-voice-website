@@ -10,6 +10,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+
 export default function SignupPage() {
   const router = useRouter()
   const [email, setEmail] = useState("")
@@ -50,7 +53,7 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${siteUrl}/auth/callback`,
         },
       })
 

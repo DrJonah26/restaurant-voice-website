@@ -7,7 +7,7 @@ export function createClient() {
 }
 
 // Server-side Supabase client
-export async function createServerClient() {
+export function createServerClient() {
   const cookieStore = cookies()
-  return createServerComponentClient({ cookies: async () => cookieStore })
+  return createServerComponentClient({ cookies: () => cookieStore })
 }

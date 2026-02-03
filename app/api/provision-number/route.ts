@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     const availableNumbers = await twilioClient
-      .availablePhoneNumbers("US")
+      .availablePhoneNumbers("DE")
       .local
       .list({
         voiceEnabled: true,
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (availableNumbers.length === 0) {
-      throw new Error("No available US phone numbers")
+      throw new Error("No available DE phone numbers")
     }
 
     const selectedNumber = availableNumbers[0]

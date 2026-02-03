@@ -5,7 +5,7 @@ import { STRIPE_PLANS } from "@/lib/stripe-plans"
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createServerClient()
+    const supabase = createServerClient(request)
     const {
       data: { user },
     } = await supabase.auth.getUser()

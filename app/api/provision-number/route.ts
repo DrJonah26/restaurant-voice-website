@@ -15,6 +15,7 @@ const twilioClient = twilio(
 )
 
 const VOICE_AGENT_URL = process.env.VOICE_AGENT_URL
+const TWILIO_ADDRESS_SID = process.env.TWILIO_ADDRESS_SID
 const IS_DEV_MODE = process.env.NODE_ENV === "development" || process.env.TWILIO_DEV_MODE === "true"
 
 export async function POST(request: NextRequest) {
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     const availableNumbers = await twilioClient
-      .availablePhoneNumbers("GB")
+      .availablePhoneNumbers("US")
       .local
       .list({
         voiceEnabled: true,
@@ -103,22 +104,37 @@ export async function POST(request: NextRequest) {
       })
 
     if (availableNumbers.length === 0) {
-      throw new Error("No available UK phone numbers")
+      throw new Error("No available US phone numbers")
     }
 
-    const selectedNumber = availableNumbers[0].phoneNumber
+    const selectedNumber = availableNumbers[0]
+    const requiresAddress =
+      selectedNumber.addressRequirements && selectedNumber.addressRequirements !== "none"
 
-    const purchasedNumber = await twilioClient.incomingPhoneNumbers.create({
-      phoneNumber: selectedNumber,
+    if (requiresAddress && !TWILIO_ADDRESS_SID) {
+      return NextResponse.json(
+        { error: "TWILIO_ADDRESS_SID is required for this phone number" },
+        { status: 400 }
+      )
+    }
+
+    const purchasePayload: Record<string, string> = {
+      phoneNumber: selectedNumber.phoneNumber,
       voiceUrl: `${VOICE_AGENT_URL}/incoming-call?practice_id=${practiceId}`,
       voiceMethod: "GET",
       friendlyName: `${practice.name} - Voice AI`,
-    })
+    }
+
+    if (requiresAddress && TWILIO_ADDRESS_SID) {
+      purchasePayload.addressSid = TWILIO_ADDRESS_SID
+    }
+
+    const purchasedNumber = await twilioClient.incomingPhoneNumbers.create(purchasePayload)
 
     const { error: updateError } = await supabase
       .from("practices")
       .update({
-        twilio_number: selectedNumber,
+        twilio_number: selectedNumber.phoneNumber,
         updated_at: new Date().toISOString(),
       })
       .eq("id", practiceId)

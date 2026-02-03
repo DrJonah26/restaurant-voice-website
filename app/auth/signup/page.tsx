@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL// ?? window.location.origin
+  process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
 
 export default function SignupPage() {
   const router = useRouter()

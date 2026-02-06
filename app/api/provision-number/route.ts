@@ -129,12 +129,6 @@ export async function POST(request: NextRequest) {
       purchasePayload.addressSid = TWILIO_ADDRESS_SID
     }
 
-    // Associate an Emergency Address (E911). Twilio expects an Address SID (AD...).
-    // Note: this only matters for placing emergency calls from the number.
-    if (TWILIO_ADDRESS_SID) {
-      purchasePayload.emergencyAddressSid = TWILIO_ADDRESS_SID
-    }
-
     const purchasedNumber = await twilioClient.incomingPhoneNumbers.create(purchasePayload)
 
     const { error: updateError } = await supabase

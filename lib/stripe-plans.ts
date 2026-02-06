@@ -8,7 +8,7 @@ export const STRIPE_PLANS = {
         name: 'Basic',
 
 
-        price: 30,
+        price: 59,
 
 
         priceId: process.env.STRIPE_BASIC_PRICE_ID || '',
@@ -50,7 +50,7 @@ export const STRIPE_PLANS = {
         name: 'Professional',
 
 
-        price: 60,
+        price: 99,
 
 
         priceId: process.env.STRIPE_PROFESSIONAL_PRICE_ID || '',

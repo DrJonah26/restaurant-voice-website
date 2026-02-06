@@ -21,12 +21,12 @@ const plans = [
       "Perfekt für Anrufe außerhalb der Öffnungszeiten",
     ],
     cta: "Plan wählen",
-    subPrice: "30€ / Monat danach",
+    subPrice: "59€ / Monat danach",
     highlighted: false,
   },
   {
     name: "Professional",
-    price: "60€",
+    price: "99€",
     period: "/ Monat",
     description: "Für Restaurants im Vollzeitbetrieb.",
     features: [
@@ -161,3 +161,4 @@ export function PricingSection({ ctaHref }: { ctaHref?: string }) {
     </ScrollReveal>
   )
 }
+

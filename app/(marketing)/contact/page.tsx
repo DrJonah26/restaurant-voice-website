@@ -25,7 +25,7 @@ export default function ContactPage() {
               Kontaktieren Sie uns
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              Senden Sie uns Ihre Fragen oder Anforderungen direkt per E-Mail. Wir melden uns schnell bei Ihnen zurueck.
+              Senden Sie uns Ihre Fragen oder Anforderungen direkt per E-Mail. Wir melden uns schnell bei Ihnen zurück.
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">

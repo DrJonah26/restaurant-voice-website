@@ -2,6 +2,7 @@
 
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,6 +11,7 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Check, CreditCard, AlertCircle } from "lucide-react"
 import { STRIPE_PLANS, TRIAL_CALLS_LIMIT } from "@/lib/stripe-plans"
+import { CONTACT_ROUTE } from "@/lib/contact"
 import { toast } from "sonner"
 
 type BillingPlanKey = keyof typeof STRIPE_PLANS | "trial"
@@ -429,8 +431,8 @@ const handleUpgrade = async (planKey: string) => {
                       Aktueller Plan
                     </Button>
                   ) : isCustom ? (
-                    <Button variant="outline" className="w-full">
-                      Kontaktieren Sie uns
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href={CONTACT_ROUTE}>Kontaktieren Sie uns</Link>
                     </Button>
                   ) : (
                     <Button

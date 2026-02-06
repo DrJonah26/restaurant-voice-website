@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      phoneNumber: selectedNumber,
+      phoneNumber: purchasedNumber.phoneNumber ?? selectedNumber.phoneNumber,
       twilioSid: purchasedNumber.sid,
       message: "Phone number provisioned successfully",
     })

@@ -144,7 +144,12 @@ export default function OnboardingPage() {
         throw new Error(result.details || result.error || "Fehler beim Einrichten der Telefonnummer")
       }
 
-      setProvisionedNumber(result.phoneNumber ?? null)
+      const resolvedPhoneNumber =
+        typeof result.phoneNumber === "string"
+          ? result.phoneNumber
+          : result.phoneNumber?.phoneNumber ?? null
+
+      setProvisionedNumber(resolvedPhoneNumber)
 
       const trialStart = new Date()
       const trialEnd = new Date(
@@ -177,7 +182,7 @@ export default function OnboardingPage() {
         })
       }
 
-      toast.success(`Onboarding abgeschlossen! Nummer: ${result.phoneNumber}`)
+      toast.success(`Onboarding abgeschlossen! Nummer: ${resolvedPhoneNumber ?? "unbekannt"}`)
     } catch (error: any) {
       toast.error(error.message || "Fehler beim Speichern")
       setLoading(false)

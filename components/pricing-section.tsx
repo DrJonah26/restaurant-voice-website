@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
 import { ScrollReveal } from "@/components/scroll-reveal"
 import { RevealWords } from "@/components/reveal-words"
+import { CONTACT_ROUTE } from "@/lib/contact"
 
 const plans = [
   {
@@ -133,10 +134,11 @@ export function PricingSection({ ctaHref }: { ctaHref?: string }) {
 
               {plan.name === "Custom" ? (
                 <Button
+                  asChild
                   className="w-full bg-secondary text-foreground hover:bg-secondary/80 border border-border mt-auto"
                   size="lg"
                 >
-                  {plan.cta}
+                  <Link href={CONTACT_ROUTE}>{plan.cta}</Link>
                 </Button>
               ) : (
                 <Link href={resolvedCtaHref}>

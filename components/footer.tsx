@@ -1,11 +1,33 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 import { Phone } from "lucide-react"
+import { CONTACT_ROUTE } from "@/lib/contact"
 
-const footerLinks = {
-  Produkt: ["Features", "Preise", "Demo"],
-  Unternehmen: ["Über uns", "Kontakt", "Karriere"],
-  Ressourcen: ["Dokumentation", "Help Center", "Fallstudien"],
-  Rechtliches: ["Datenschutz", "AGB", "Impressum"],
+type FooterLink = {
+  label: string
+  href: string
+}
+
+const footerLinks: Record<string, FooterLink[]> = {
+  Produkt: [
+    { label: "Features", href: "#" },
+    { label: "Preise", href: "#" },
+    { label: "Demo", href: "#" },
+  ],
+  Unternehmen: [
+    { label: "Über uns", href: "#" },
+    { label: "Kontakt", href: CONTACT_ROUTE },
+    { label: "Karriere", href: "#" },
+  ],
+  Ressourcen: [
+    { label: "Dokumentation", href: "#" },
+    { label: "Help Center", href: "#" },
+    { label: "Fallstudien", href: "#" },
+  ],
+  Rechtliches: [
+    { label: "Datenschutz", href: "#" },
+    { label: "AGB", href: "#" },
+    { label: "Impressum", href: "#" },
+  ],
 }
 
 export function Footer() {
@@ -30,12 +52,12 @@ export function Footer() {
               <h4 className="font-semibold text-foreground mb-4">{category}</h4>
               <ul className="space-y-3">
                 {links.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <Link
-                      href="#"
+                      href={link.href}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {link}
+                      {link.label}
                     </Link>
                   </li>
                 ))}
@@ -45,9 +67,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2024 JoydeAI. Alle Rechte vorbehalten.
-          </p>
+          <p className="text-sm text-muted-foreground">© 2024 JoydeAI. Alle Rechte vorbehalten.</p>
           <div className="flex items-center gap-6">
             <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">
               LinkedIn

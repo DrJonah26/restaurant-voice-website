@@ -11,8 +11,14 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
+import { PhoneNumberField } from "@/components/phone-number-field"
 import { toast } from "sonner"
 import { Save } from "lucide-react"
+import {
+  DEFAULT_PHONE_COUNTRY_ISO2,
+  formatPhoneNumberForStorage,
+  parseStoredPhoneNumber,
+} from "@/lib/phone-countries"
 
 const DAYS = [
   { value: "monday", label: "Montag" },
@@ -29,7 +35,6 @@ export default function SettingsPage() {
   const [restaurant, setRestaurant] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
-  const countryPrefix = "+49"
 
   // Restaurant settings
   const [restaurantName, setRestaurantName] = useState("")
@@ -39,6 +44,9 @@ export default function SettingsPage() {
   const [closedDays, setClosedDays] = useState<string[]>([])
 
   // Phone settings
+  const [phoneCountryIso2, setPhoneCountryIso2] = useState(
+    DEFAULT_PHONE_COUNTRY_ISO2
+  )
   const [phoneNumber, setPhoneNumber] = useState("")
   const [provisionedNumber, setProvisionedNumber] = useState<string | null>(null)
 
@@ -76,7 +84,11 @@ export default function SettingsPage() {
       setOpeningTime(restaurantData.opening_time || "09:00")
       setClosingTime(restaurantData.closing_time || "22:00")
       setClosedDays(restaurantData.closed_days || [])
-      setPhoneNumber(stripCountryPrefix(restaurantData.phone_number || ""))
+      const parsedPhoneNumber = parseStoredPhoneNumber(
+        restaurantData.phone_number || ""
+      )
+      setPhoneCountryIso2(parsedPhoneNumber.country.iso2)
+      setPhoneNumber(parsedPhoneNumber.localNumber)
       setProvisionedNumber(restaurantData.twilio_number || null)
       setEmailNotificationsEnabled(
         restaurantData.email_notifications_enabled ?? true
@@ -98,17 +110,6 @@ export default function SettingsPage() {
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     )
   }
-
-  const stripCountryPrefix = (value: string) => {
-    const trimmed = value.trim()
-    if (!trimmed) return ""
-    if (trimmed.startsWith(countryPrefix)) {
-      return trimmed.slice(countryPrefix.length).trim()
-    }
-    return trimmed
-  }
-
-  const normalizeLocalNumber = (value: string) => value.replace(/\s+/g, "")
 
   const handleSaveRestaurant = async () => {
     setLoading(true)
@@ -140,9 +141,7 @@ export default function SettingsPage() {
       const { error } = await supabase
         .from("practices")
         .update({
-          phone_number: phoneNumber
-            ? `${countryPrefix}${normalizeLocalNumber(phoneNumber)}`
-            : null,
+          phone_number: formatPhoneNumberForStorage(phoneCountryIso2, phoneNumber),
         })
         .eq("id", restaurant.id)
 
@@ -304,19 +303,14 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="phoneNumber">Ihre Telefonnummer</Label>
-                <div className="flex">
-                  <div className="flex items-center rounded-l-md border border-border bg-muted px-3 text-sm text-muted-foreground">
-                    {countryPrefix}
-                  </div>
-                  <Input
-                    id="phoneNumber"
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="30 1234 5678"
-                    className="rounded-l-none"
-                  />
-                </div>
+                <PhoneNumberField
+                  id="phoneNumber"
+                  countryIso2={phoneCountryIso2}
+                  onCountryIso2Change={setPhoneCountryIso2}
+                  localNumber={phoneNumber}
+                  onLocalNumberChange={setPhoneNumber}
+                  placeholder="30 1234 5678"
+                />
               </div>
               <div className="rounded-lg border border-border bg-muted/10 p-4">
                 <div className="space-y-2">

@@ -7,11 +7,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
+import { PhoneNumberField } from "@/components/phone-number-field"
 import { createClient } from "@/lib/supabase/client"
 import { TRIAL_CALLS_LIMIT, TRIAL_DURATION_DAYS } from "@/lib/stripe-plans"
+import {
+  DEFAULT_PHONE_COUNTRY_ISO2,
+  formatPhoneNumberForStorage,
+} from "@/lib/phone-countries"
 import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect } from "react"
@@ -65,7 +69,10 @@ export default function OnboardingPage() {
   // Step 2: Restaurant Info
   const [restaurantName, setRestaurantName] = useState("")
   const [restaurantEmail, setRestaurantEmail] = useState("")
-  const [restaurantPhone, setRestaurantPhone] = useState("")
+  const [restaurantPhoneCountryIso2, setRestaurantPhoneCountryIso2] = useState(
+    DEFAULT_PHONE_COUNTRY_ISO2
+  )
+  const [restaurantPhoneLocal, setRestaurantPhoneLocal] = useState("")
 
   // Step 3: Hours & Capacity
   const [openingTime, setOpeningTime] = useState("09:00")
@@ -75,6 +82,9 @@ export default function OnboardingPage() {
 
   const totalSteps = 4
   const progress = (step / totalSteps) * 100
+  const restaurantPhone =
+    formatPhoneNumberForStorage(restaurantPhoneCountryIso2, restaurantPhoneLocal) ??
+    ""
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -113,7 +123,7 @@ export default function OnboardingPage() {
             user_id: user.id,
             name: restaurantName,
             email: restaurantEmail,
-            phone_number: restaurantPhone,
+            phone_number: restaurantPhone || null,
             opening_time: openingTime,
             closing_time: closingTime,
             max_capacity: maxCapacity[0],
@@ -280,12 +290,13 @@ export default function OnboardingPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="restaurantPhone">Telefon *</Label>
-                    <Input
+                    <PhoneNumberField
                       id="restaurantPhone"
-                      type="tel"
-                      value={restaurantPhone}
-                      onChange={(e) => setRestaurantPhone(e.target.value)}
-                      placeholder="+49 30 1234 5678"
+                      countryIso2={restaurantPhoneCountryIso2}
+                      onCountryIso2Change={setRestaurantPhoneCountryIso2}
+                      localNumber={restaurantPhoneLocal}
+                      onLocalNumberChange={setRestaurantPhoneLocal}
+                      placeholder="30 1234 5678"
                       required
                     />
                   </div>

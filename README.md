@@ -159,7 +159,7 @@ CREATE POLICY "Users can update own reservations"
 5. **E-Mail Benachrichtigungen (IONOS + Cron):**
 - Führen Sie die Migration in `supabase/migrations/202602061900_notifications.sql` aus.
 - Konfigurieren Sie `CRON_SECRET` als Environment Variable in Vercel.
-- Der stündliche Cron ist in `vercel.json` auf `/api/cron/notifications` gesetzt.
+- Der Cron ist auf Hobby täglich konfiguriert (einmal pro Tag) in `vercel.json` auf `/api/cron/notifications`.
 - Interner Hook für neue Reservierungen:
   - `POST /api/internal/notifications/reservation-created`
   - Header: `Authorization: Bearer <INTERNAL_API_SECRET>`

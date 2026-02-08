@@ -74,6 +74,9 @@ export function PhoneNumberField({
     })
   }, [searchQuery])
 
+  const getFlagUrl = (iso2: string) =>
+    `https://flagcdn.com/24x18/${iso2.toLowerCase()}.png`
+
   return (
     <div ref={containerRef} className={cn("relative", className)}>
       <div className="flex">
@@ -87,7 +90,14 @@ export function PhoneNumberField({
           aria-label="Ländervorwahl auswählen"
         >
           <span className="flex items-center gap-2">
-            <span className="shrink-0">{selectedCountry.flag}</span>
+            <img
+              src={getFlagUrl(selectedCountry.iso2)}
+              alt={selectedCountry.name}
+              width={18}
+              height={14}
+              className="h-[14px] w-[18px] shrink-0 rounded-[2px] object-cover"
+              loading="lazy"
+            />
             <span className="tabular-nums">{selectedCountry.dialCode}</span>
           </span>
           <ChevronDown className="ml-2 h-4 w-4 text-muted-foreground" />
@@ -139,12 +149,19 @@ export function PhoneNumberField({
                       onCountryIso2Change(country.iso2)
                       setIsOpen(false)
                     }}
-                  >
-                    <span className="flex min-w-0 items-center gap-2">
-                      <span className="shrink-0">{country.flag}</span>
-                      <span className="shrink-0 tabular-nums font-medium">
-                        {country.dialCode}
-                      </span>
+                    >
+                      <span className="flex min-w-0 items-center gap-2">
+                        <img
+                          src={getFlagUrl(country.iso2)}
+                          alt={country.name}
+                          width={18}
+                          height={14}
+                          className="h-[14px] w-[18px] shrink-0 rounded-[2px] object-cover"
+                          loading="lazy"
+                        />
+                        <span className="shrink-0 tabular-nums font-medium">
+                          {country.dialCode}
+                        </span>
                       <span className="truncate text-muted-foreground">
                         {country.name}
                       </span>

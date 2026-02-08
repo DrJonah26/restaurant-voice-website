@@ -44,6 +44,9 @@ export default function SettingsPage() {
 
   // Notification settings
   const [emailNotificationsEnabled, setEmailNotificationsEnabled] = useState(true)
+  const [notifyReservationCreated, setNotifyReservationCreated] = useState(true)
+  const [notifyAccessExpiring3d, setNotifyAccessExpiring3d] = useState(true)
+  const [notifyCallLimit80, setNotifyCallLimit80] = useState(true)
 
   useEffect(() => {
     const loadData = async () => {
@@ -78,6 +81,13 @@ export default function SettingsPage() {
       setEmailNotificationsEnabled(
         restaurantData.email_notifications_enabled ?? true
       )
+      setNotifyReservationCreated(
+        restaurantData.notify_reservation_created ?? true
+      )
+      setNotifyAccessExpiring3d(
+        restaurantData.notify_access_expiring_3d ?? true
+      )
+      setNotifyCallLimit80(restaurantData.notify_call_limit_80 ?? true)
     }
 
     loadData()
@@ -153,6 +163,9 @@ export default function SettingsPage() {
         .from("practices")
         .update({
           email_notifications_enabled: emailNotificationsEnabled,
+          notify_reservation_created: notifyReservationCreated,
+          notify_access_expiring_3d: notifyAccessExpiring3d,
+          notify_call_limit_80: notifyCallLimit80,
         })
         .eq("id", restaurant.id)
 
@@ -163,6 +176,9 @@ export default function SettingsPage() {
           ? {
               ...prev,
               email_notifications_enabled: emailNotificationsEnabled,
+              notify_reservation_created: notifyReservationCreated,
+              notify_access_expiring_3d: notifyAccessExpiring3d,
+              notify_call_limit_80: notifyCallLimit80,
             }
           : prev
       )
@@ -376,6 +392,47 @@ export default function SettingsPage() {
                   checked={emailNotificationsEnabled}
                   onCheckedChange={setEmailNotificationsEnabled}
                 />
+              </div>
+              <div className="space-y-3 rounded-lg border border-border bg-background p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Neue Reservierungen</p>
+                    <p className="text-xs text-muted-foreground">
+                      E-Mail bei jeder neuen Reservierung.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notifyReservationCreated}
+                    onCheckedChange={setNotifyReservationCreated}
+                    disabled={!emailNotificationsEnabled}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Zugriff endet in 3 Tagen</p>
+                    <p className="text-xs text-muted-foreground">
+                      Warnung vor Trial- oder Abo-Ende mit Upgrade-Hinweis.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notifyAccessExpiring3d}
+                    onCheckedChange={setNotifyAccessExpiring3d}
+                    disabled={!emailNotificationsEnabled}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">80%-Anruflimit erreicht</p>
+                    <p className="text-xs text-muted-foreground">
+                      Benachrichtigung beim ersten Erreichen pro Monat.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notifyCallLimit80}
+                    onCheckedChange={setNotifyCallLimit80}
+                    disabled={!emailNotificationsEnabled}
+                  />
+                </div>
               </div>
               <Button onClick={handleSaveNotifications} disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />

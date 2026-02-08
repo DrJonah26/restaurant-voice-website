@@ -68,7 +68,9 @@ export async function POST(request: NextRequest) {
 
     const practiceResult = await supabase
       .from("practices")
-      .select("id, name, email, email_notifications_enabled")
+      .select(
+        "id, name, email, email_notifications_enabled, notify_reservation_created"
+      )
       .eq("id", reservation.practice_id)
       .maybeSingle()
 
@@ -81,7 +83,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Practice not found" }, { status: 404 })
     }
 
-    if (!practice.email_notifications_enabled) {
+    if (
+      !practice.email_notifications_enabled ||
+      practice.notify_reservation_created === false
+    ) {
       return NextResponse.json({
         ok: true,
         skipped: "notifications_disabled",

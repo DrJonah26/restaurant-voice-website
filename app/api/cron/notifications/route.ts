@@ -24,6 +24,8 @@ type PracticeRecord = {
   email: string | null
   onboarding_completed: boolean | null
   email_notifications_enabled: boolean | null
+  notify_access_expiring_3d: boolean | null
+  notify_call_limit_80: boolean | null
   subscription_plan: string | null
   trial_ends_at: string | null
   subscription_ends_at: string | null
@@ -139,7 +141,7 @@ export async function GET(request: NextRequest) {
     const practicesResult = await supabase
       .from("practices")
       .select(
-        "id, name, email, onboarding_completed, email_notifications_enabled, subscription_plan, trial_ends_at, subscription_ends_at, subscription_cancel_at_period_end, calls_limit"
+        "id, name, email, onboarding_completed, email_notifications_enabled, notify_access_expiring_3d, notify_call_limit_80, subscription_plan, trial_ends_at, subscription_ends_at, subscription_cancel_at_period_end, calls_limit"
       )
       .eq("onboarding_completed", true)
       .eq("email_notifications_enabled", true)
@@ -188,7 +190,7 @@ export async function GET(request: NextRequest) {
       }
 
       const accessWarning = resolveAccessWarning(practice, now)
-      if (accessWarning) {
+      if (accessWarning && practice.notify_access_expiring_3d !== false) {
         const event = await acquireNotificationEvent(supabase, {
           practiceId: practice.id,
           eventType: "access_expiring_3d",
@@ -227,6 +229,9 @@ export async function GET(request: NextRequest) {
       }
 
       const callsLimit = practice.calls_limit ?? 0
+      if (practice.notify_call_limit_80 === false) {
+        continue
+      }
       if (callsLimit <= 0) {
         continue
       }

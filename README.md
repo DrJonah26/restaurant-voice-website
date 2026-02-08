@@ -157,7 +157,7 @@ CREATE POLICY "Users can update own reservations"
 - Konfigurieren Sie Webhooks fÃ¼r `/api/stripe/webhook`
 
 5. **E-Mail Benachrichtigungen (IONOS + Cron):**
-- Führen Sie die Migration in `supabase/migrations/202602061900_notifications.sql` aus.
+- Führen Sie die Migrationen `supabase/migrations/202602061900_notifications.sql` und `supabase/migrations/202602091000_notification_preferences.sql` aus.
 - Konfigurieren Sie `CRON_SECRET` als Environment Variable in Vercel.
 - Der Cron ist auf Hobby täglich konfiguriert (einmal pro Tag) in `vercel.json` auf `/api/cron/notifications`.
 - Interner Hook für neue Reservierungen:

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
@@ -41,6 +42,9 @@ export default function SettingsPage() {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [provisionedNumber, setProvisionedNumber] = useState<string | null>(null)
 
+  // Notification settings
+  const [emailNotificationsEnabled, setEmailNotificationsEnabled] = useState(true)
+
   useEffect(() => {
     const loadData = async () => {
       const {
@@ -71,6 +75,9 @@ export default function SettingsPage() {
       setClosedDays(restaurantData.closed_days || [])
       setPhoneNumber(stripCountryPrefix(restaurantData.phone_number || ""))
       setProvisionedNumber(restaurantData.twilio_number || null)
+      setEmailNotificationsEnabled(
+        restaurantData.email_notifications_enabled ?? true
+      )
     }
 
     loadData()
@@ -139,6 +146,34 @@ export default function SettingsPage() {
     }
   }
 
+  const handleSaveNotifications = async () => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from("practices")
+        .update({
+          email_notifications_enabled: emailNotificationsEnabled,
+        })
+        .eq("id", restaurant.id)
+
+      if (error) throw error
+
+      setRestaurant((prev: any) =>
+        prev
+          ? {
+              ...prev,
+              email_notifications_enabled: emailNotificationsEnabled,
+            }
+          : prev
+      )
+      toast.success("Benachrichtigungs-Einstellungen gespeichert")
+    } catch (error: any) {
+      toast.error(error.message || "Fehler beim Speichern")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleCopyNumber = async () => {
     if (!provisionedNumber) return
     try {
@@ -162,6 +197,7 @@ export default function SettingsPage() {
         <TabsList>
           <TabsTrigger value="restaurant">Restaurant</TabsTrigger>
           <TabsTrigger value="phone">Telefon</TabsTrigger>
+          <TabsTrigger value="notifications">Benachrichtigungen</TabsTrigger>
         </TabsList>
 
         {/* Restaurant Tab */}
@@ -312,6 +348,36 @@ export default function SettingsPage() {
                 </div>
               </div>
               <Button onClick={handleSavePhone} disabled={loading}>
+                <Save className="mr-2 h-4 w-4" />
+                Speichern
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Notifications Tab */}
+        <TabsContent value="notifications">
+          <Card>
+            <CardHeader>
+              <CardTitle>E-Mail-Benachrichtigungen</CardTitle>
+              <CardDescription>
+                Aktivieren oder deaktivieren Sie alle Systemmails.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between rounded-lg border border-border bg-muted/10 p-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Systemmails aktivieren</p>
+                  <p className="text-sm text-muted-foreground">
+                    Gilt für neue Reservierungen, 3-Tage-Hinweise und 80%-Limit-Warnung.
+                  </p>
+                </div>
+                <Switch
+                  checked={emailNotificationsEnabled}
+                  onCheckedChange={setEmailNotificationsEnabled}
+                />
+              </div>
+              <Button onClick={handleSaveNotifications} disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />
                 Speichern
               </Button>

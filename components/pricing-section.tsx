@@ -13,7 +13,7 @@ const plans = [
     period: "/ 7 Tage testen",
     description: "Ideal für kleine Restaurants und den schnellen Einstieg.",
     features: [
-      "50 Anrufe/Monat",
+      "300 Anrufe/Monat",
       "Automatische Reservierungen",
       "24/7 Erreichbarkeit",
       "E-Mail Benachrichtigungen",

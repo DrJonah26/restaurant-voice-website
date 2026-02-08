@@ -1,17 +1,17 @@
-# Voice AI Restaurant Assistent
+﻿# Voice AI Restaurant Assistent
 
-Eine vollständige SaaS-Website für einen Voice AI Restaurant-Assistenten mit Next.js 14, TypeScript, Supabase und Stripe.
+Eine vollstÃ¤ndige SaaS-Website fÃ¼r einen Voice AI Restaurant-Assistenten mit Next.js 14, TypeScript, Supabase und Stripe.
 
 ## Features
 
-- 🎯 **Landing Page** mit Hero, Features, Demo Audio, Pricing und FAQ
-- 🔐 **Authentifizierung** mit Supabase (Email/Password + Google OAuth)
-- 📝 **Onboarding** Multi-Step Flow für neue Benutzer
-- 📊 **Dashboard** mit Übersicht, Statistiken und Quick Actions
-- 📅 **Reservierungen** Verwaltung mit Filter, Suche und Tabelle
-- ⚙️ **Einstellungen** für Restaurant, Voice Agent und Telefon
-- 📈 **Analytics** mit Charts und KPIs
-- 💳 **Abrechnung** mit Stripe Integration
+- ðŸŽ¯ **Landing Page** mit Hero, Features, Demo Audio, Pricing und FAQ
+- ðŸ” **Authentifizierung** mit Supabase (Email/Password + Google OAuth)
+- ðŸ“ **Onboarding** Multi-Step Flow fÃ¼r neue Benutzer
+- ðŸ“Š **Dashboard** mit Ãœbersicht, Statistiken und Quick Actions
+- ðŸ“… **Reservierungen** Verwaltung mit Filter, Suche und Tabelle
+- âš™ï¸ **Einstellungen** fÃ¼r Restaurant, Voice Agent und Telefon
+- ðŸ“ˆ **Analytics** mit Charts und KPIs
+- ðŸ’³ **Abrechnung** mit Stripe Integration
 
 ## Tech Stack
 
@@ -47,6 +47,18 @@ NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# SMTP (IONOS)
+SMTP_HOST=smtp.ionos.de
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=mailbox@your-domain.tld
+SMTP_PASS=your_mailbox_password
+SMTP_FROM=mailbox@your-domain.tld
+
+# Internal notification auth
+INTERNAL_API_SECRET=your_internal_api_secret
+CRON_SECRET=your_cron_secret
 ```
 
 3. **Supabase Datenbank Setup:**
@@ -141,68 +153,80 @@ CREATE POLICY "Users can update own reservations"
 
 4. **Stripe Setup:**
 - Erstellen Sie Produkte und Preise in Stripe Dashboard
-- Fügen Sie die Price IDs zu `lib/stripe.ts` hinzu
-- Konfigurieren Sie Webhooks für `/api/stripe/webhook`
+- FÃ¼gen Sie die Price IDs zu `lib/stripe.ts` hinzu
+- Konfigurieren Sie Webhooks fÃ¼r `/api/stripe/webhook`
 
-5. **Development Server starten:**
+5. **E-Mail Benachrichtigungen (IONOS + Cron):**
+- Führen Sie die Migration in `supabase/migrations/202602061900_notifications.sql` aus.
+- Konfigurieren Sie `CRON_SECRET` als Environment Variable in Vercel.
+- Der stündliche Cron ist in `vercel.json` auf `/api/cron/notifications` gesetzt.
+- Interner Hook für neue Reservierungen:
+  - `POST /api/internal/notifications/reservation-created`
+  - Header: `Authorization: Bearer <INTERNAL_API_SECRET>`
+  - Body: `{ "reservationId": "<uuid>" }`
+  - Retry-Regel: bei 5xx mit Backoff retryen, bei 2xx nicht retryen.
+
+6. **Development Server starten:**
 ```bash
 npm run dev
 ```
 
-Die Anwendung läuft dann auf [http://localhost:3000](http://localhost:3000)
+Die Anwendung lÃ¤uft dann auf [http://localhost:3000](http://localhost:3000)
 
 ## Projektstruktur
 
 ```
 app/
-├── (auth)/              # Auth Pages
-│   ├── login/
-│   ├── signup/
-│   └── callback/
-├── (marketing)/         # Marketing Pages
-│   └── page.tsx        # Landing Page
-├── onboarding/         # Onboarding Flow
-├── dashboard/          # Dashboard Pages
-│   ├── layout.tsx      # Sidebar Layout
-│   ├── page.tsx        # Übersicht
-│   ├── reservations/   # Reservierungen
-│   ├── settings/       # Einstellungen
-│   ├── analytics/      # Analytics
-│   └── billing/        # Abrechnung
-└── api/                # API Routes
-    └── stripe/         # Stripe Integration
+â”œâ”€â”€ (auth)/              # Auth Pages
+â”‚   â”œâ”€â”€ login/
+â”‚   â”œâ”€â”€ signup/
+â”‚   â””â”€â”€ callback/
+â”œâ”€â”€ (marketing)/         # Marketing Pages
+â”‚   â””â”€â”€ page.tsx        # Landing Page
+â”œâ”€â”€ onboarding/         # Onboarding Flow
+â”œâ”€â”€ dashboard/          # Dashboard Pages
+â”‚   â”œâ”€â”€ layout.tsx      # Sidebar Layout
+â”‚   â”œâ”€â”€ page.tsx        # Ãœbersicht
+â”‚   â”œâ”€â”€ reservations/   # Reservierungen
+â”‚   â”œâ”€â”€ settings/       # Einstellungen
+â”‚   â”œâ”€â”€ analytics/      # Analytics
+â”‚   â””â”€â”€ billing/        # Abrechnung
+â””â”€â”€ api/                # API Routes
+    â””â”€â”€ stripe/         # Stripe Integration
 
 components/
-├── ui/                 # Shadcn UI Components
-└── theme-provider.tsx  # Theme Provider
+â”œâ”€â”€ ui/                 # Shadcn UI Components
+â””â”€â”€ theme-provider.tsx  # Theme Provider
 
 lib/
-├── supabase.ts         # Supabase Client
-├── stripe.ts           # Stripe Config
-└── utils.ts            # Utilities
+â”œâ”€â”€ supabase.ts         # Supabase Client
+â”œâ”€â”€ stripe.ts           # Stripe Config
+â””â”€â”€ utils.ts            # Utilities
 ```
 
 ## Wichtige Features
 
-- ✅ Vollständige Authentifizierung mit Supabase
-- ✅ Protected Routes für Dashboard
-- ✅ Onboarding nur einmal anzeigen
-- ✅ Responsive Design (Mobile-first)
-- ✅ Loading States überall
-- ✅ Error Handling mit Toast Notifications
-- ✅ Form Validation mit Zod + React Hook Form
-- ✅ Dark Mode Support
-- ✅ Smooth Animations mit Framer Motion
+- âœ… VollstÃ¤ndige Authentifizierung mit Supabase
+- âœ… Protected Routes fÃ¼r Dashboard
+- âœ… Onboarding nur einmal anzeigen
+- âœ… Responsive Design (Mobile-first)
+- âœ… Loading States Ã¼berall
+- âœ… Error Handling mit Toast Notifications
+- âœ… Form Validation mit Zod + React Hook Form
+- âœ… Dark Mode Support
+- âœ… Smooth Animations mit Framer Motion
 
-## Nächste Schritte
+## NÃ¤chste Schritte
 
 - [ ] Supabase Datenbank Tabellen erstellen
 - [ ] Stripe Produkte und Preise konfigurieren
 - [ ] Google OAuth in Supabase aktivieren
-- [ ] Webhook Endpoint für Stripe konfigurieren
-- [ ] Demo Audio Datei hinzufügen
+- [ ] Webhook Endpoint fÃ¼r Stripe konfigurieren
+- [ ] Demo Audio Datei hinzufÃ¼gen
 - [ ] Echte Daten statt Mock Data verwenden
 
 ## Lizenz
 
 MIT
+
+

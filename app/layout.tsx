@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   description: "KI beantwortet Telefonate, bucht Tische, entlastet Ihr Team - 24/7",
 }
 
+
 export default function RootLayout({
   children,
 }: {

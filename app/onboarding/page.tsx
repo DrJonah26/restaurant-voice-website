@@ -209,6 +209,7 @@ export default function OnboardingPage() {
       toast.error(error.message || "Kopieren fehlgeschlagen")
     }
   }
+  const forwardingTarget = provisionedNumber ?? "Zielnummer"
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
@@ -478,15 +479,15 @@ export default function OnboardingPage() {
                       </div>
                       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
                         <div className="font-medium">Für alle Anrufe</div>
-                        <div>**21*Zielnummer#</div>
+                        <div>{`**21*${forwardingTarget}#`}</div>
                       </div>
                       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
                         <div className="font-medium">Nur bei nicht besetzt</div>
-                        <div>**67*Zielnummer#</div>
+                        <div>{`**67*${forwardingTarget}#`}</div>
                       </div>
                       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
                         <div className="font-medium">Nur bei nicht melden</div>
-                        <div>**61*Zielnummer#</div>
+                        <div>{`**61*${forwardingTarget}#`}</div>
                       </div>
                       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
                         <div className="font-medium">Deaktivieren</div>

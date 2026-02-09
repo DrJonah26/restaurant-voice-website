@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useEffect } from "react"
 import confetti from "canvas-confetti"
 import type { CreateTypes } from "canvas-confetti"
+import { Info } from "lucide-react"
 
 const DAYS = [
   { value: "monday", label: "Montag" },
@@ -41,7 +42,7 @@ export default function OnboardingPage() {
   const [showGuide, setShowGuide] = useState(false)
   const supabase = createClient()
 
-  // ⬇️ HIER
+  // â¬‡ï¸ HIER
   useEffect(() => {
     const checkExisting = async () => {
       const {
@@ -73,6 +74,10 @@ export default function OnboardingPage() {
     DEFAULT_PHONE_COUNTRY_ISO2
   )
   const [restaurantPhoneLocal, setRestaurantPhoneLocal] = useState("")
+  const [extraPhoneCountryIso2, setExtraPhoneCountryIso2] = useState(
+    DEFAULT_PHONE_COUNTRY_ISO2
+  )
+  const [extraPhoneLocal, setExtraPhoneLocal] = useState("")
 
   // Step 3: Hours & Capacity
   const [openingTime, setOpeningTime] = useState("09:00")
@@ -85,6 +90,8 @@ export default function OnboardingPage() {
   const restaurantPhone =
     formatPhoneNumberForStorage(restaurantPhoneCountryIso2, restaurantPhoneLocal) ??
     ""
+  const extraPhone =
+    formatPhoneNumberForStorage(extraPhoneCountryIso2, extraPhoneLocal) ?? ""
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -124,6 +131,7 @@ export default function OnboardingPage() {
             name: restaurantName,
             email: restaurantEmail,
             phone_number: restaurantPhone || null,
+            extra_number: extraPhone || null,
             opening_time: openingTime,
             closing_time: closingTime,
             max_capacity: maxCapacity[0],
@@ -264,7 +272,7 @@ export default function OnboardingPage() {
                 <div>
                   <h2 className="text-2xl font-bold mb-2">Restaurant-Informationen</h2>
                   <p className="text-muted-foreground">
-                    Geben Sie uns einige grundlegende Informationen über Ihr Restaurant.
+                    Geben Sie uns einige grundlegende Informationen Ã¼ber Ihr Restaurant.
                   </p>
                 </div>
                 <div className="space-y-4">
@@ -290,7 +298,7 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="restaurantPhone">Telefon *</Label>
+                    <Label htmlFor="restaurantPhone">GeschÃ¤ftsnummer *</Label>
                     <PhoneNumberField
                       id="restaurantPhone"
                       countryIso2={restaurantPhoneCountryIso2}
@@ -301,15 +309,41 @@ export default function OnboardingPage() {
                       required
                     />
                   </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="extraPhone">Rufnummer für Weiterleitung *</Label>
+                      <span className="group relative inline-flex">
+                        <button
+                          type="button"
+                          aria-label="Information zur weiteren Telefonnummer"
+                          className="inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-72 -translate-x-1/2 rounded-md border border-border bg-popover p-2 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                          Damit wir Ihre Kunden bei Bedarf persÃ¶nlich verbinden kÃ¶nnen, benÃ¶tigen wir eine zweite Rufnummer fÃ¼r die KI-Weiterleitung.
+                        </span>
+                      </span>
+                    </div>
+                    <PhoneNumberField
+                      id="extraPhone"
+                      countryIso2={extraPhoneCountryIso2}
+                      onCountryIso2Change={setExtraPhoneCountryIso2}
+                      localNumber={extraPhoneLocal}
+                      onLocalNumberChange={setExtraPhoneLocal}
+                      placeholder="30 1234 5678"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={handleBack} className="flex-1">
-                    Zurück
+                    ZurÃ¼ck
                   </Button>
                   <Button
                     onClick={handleNext}
                     className="flex-1"
-                    disabled={!restaurantName || !restaurantEmail || !restaurantPhone}
+                    disabled={!restaurantName || !restaurantEmail || !restaurantPhone || !extraPhone}
                   >
                     Weiter
                   </Button>
@@ -327,15 +361,15 @@ export default function OnboardingPage() {
                 className="space-y-6"
               >
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">Öffnungszeiten & Kapazität</h2>
+                  <h2 className="text-2xl font-bold mb-2">Ã–ffnungszeiten & KapazitÃ¤t</h2>
                   <p className="text-muted-foreground">
-                    Konfigurieren Sie die Öffnungszeiten und die maximale Kapazität.
+                    Konfigurieren Sie die Ã–ffnungszeiten und die maximale KapazitÃ¤t.
                   </p>
                 </div>
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="openingTime">Öffnungszeit</Label>
+                      <Label htmlFor="openingTime">Ã–ffnungszeit</Label>
                       <Input
                         id="openingTime"
                         type="time"
@@ -344,7 +378,7 @@ export default function OnboardingPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="closingTime">Schließzeit</Label>
+                      <Label htmlFor="closingTime">SchlieÃŸzeit</Label>
                       <Input
                         id="closingTime"
                         type="time"
@@ -354,7 +388,7 @@ export default function OnboardingPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Maximale Kapazität: {maxCapacity[0]} Personen</Label>
+                    <Label>Maximale KapazitÃ¤t: {maxCapacity[0]} Personen</Label>
                     <Slider
                       value={maxCapacity}
                       onValueChange={setMaxCapacity}
@@ -386,7 +420,7 @@ export default function OnboardingPage() {
                 </div>
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={handleBack} className="flex-1">
-                    Zurück
+                    ZurÃ¼ck
                   </Button>
                   <Button onClick={handleNext} className="flex-1">
                     Weiter
@@ -407,7 +441,7 @@ export default function OnboardingPage() {
                 <div>
                   <h2 className="text-2xl font-bold mb-2">Fertig!</h2>
                   <p className="text-muted-foreground">
-                    Überprüfen Sie Ihre Angaben und schließen Sie das Onboarding ab.
+                    ÃœberprÃ¼fen Sie Ihre Angaben und schlieÃŸen Sie das Onboarding ab.
                   </p>
                 </div>
                 <Card>
@@ -425,18 +459,24 @@ export default function OnboardingPage() {
                     </div>
                     {restaurantPhone && (
                       <div>
-                        <p className="text-sm font-semibold text-muted-foreground">Telefon</p>
+                        <p className="text-sm font-semibold text-muted-foreground">GeschÃ¤ftsnummer</p>
                         <p className="text-lg">{restaurantPhone}</p>
                       </div>
                     )}
+                    {extraPhone && (
+                      <div>
+                        <p className="text-sm font-semibold text-muted-foreground">Rufnummer für Weiterleitung</p>
+                        <p className="text-lg">{extraPhone}</p>
+                      </div>
+                    )}
                     <div>
-                      <p className="text-sm font-semibold text-muted-foreground">Öffnungszeiten</p>
+                      <p className="text-sm font-semibold text-muted-foreground">Ã–ffnungszeiten</p>
                       <p className="text-lg">
                         {openingTime} - {closingTime} Uhr
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-muted-foreground">Maximale Kapazität</p>
+                      <p className="text-sm font-semibold text-muted-foreground">Maximale KapazitÃ¤t</p>
                       <p className="text-lg">{maxCapacity[0]} Personen</p>
                     </div>
                     {closedDays.length > 0 && (
@@ -456,7 +496,7 @@ export default function OnboardingPage() {
                     <CardHeader>
                       <CardTitle>Anleitung zur Weiterleitung einer Telefonnummer</CardTitle>
                       <CardDescription>
-                        Geben Sie die untenstehenden Tastenkombinationen auf Ihrem Gerät ein.
+                        Geben Sie die untenstehenden Tastenkombinationen auf Ihrem GerÃ¤t ein.
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -464,7 +504,7 @@ export default function OnboardingPage() {
                         <p className="text-sm font-semibold text-muted-foreground">Zielnummer</p>
                         <div className="flex items-center gap-3">
                           <p className="text-lg font-medium">
-                            {provisionedNumber ?? "Noch nicht verfügbar"}
+                            {provisionedNumber ?? "Noch nicht verfÃ¼gbar"}
                           </p>
                           <Button
                             type="button"
@@ -478,7 +518,7 @@ export default function OnboardingPage() {
                         </div>
                       </div>
                       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
-                        <div className="font-medium">Für alle Anrufe</div>
+                        <div className="font-medium">FÃ¼r alle Anrufe</div>
                         <div>{`**21*${forwardingTarget}#`}</div>
                       </div>
                       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
@@ -498,7 +538,7 @@ export default function OnboardingPage() {
                 )}
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={handleBack} className="flex-1">
-                    Zurück
+                    ZurÃ¼ck
                   </Button>
                   {showGuide ? (
                     <Button onClick={() => router.push("/dashboard")} className="flex-1">
@@ -508,9 +548,9 @@ export default function OnboardingPage() {
                     <Button onClick={handleFinish} className="flex-1" disabled={loading}>
                     {loading
                       ? provisioningNumber
-                        ? "📞 Telefonnummer wird eingerichtet..."
+                        ? "ðŸ“ž Telefonnummer wird eingerichtet..."
                         : "Wird gespeichert..."
-                      : "Dashboard öffnen"}
+                      : "Dashboard Ã¶ffnen"}
                   </Button>
                   )}
                 </div>
@@ -523,3 +563,4 @@ export default function OnboardingPage() {
     </div>
   )
 }
+

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { PhoneNumberField } from "@/components/phone-number-field"
 import { toast } from "sonner"
-import { Save } from "lucide-react"
+import { Info, Save } from "lucide-react"
 import {
   DEFAULT_PHONE_COUNTRY_ISO2,
   formatPhoneNumberForStorage,
@@ -48,6 +48,10 @@ export default function SettingsPage() {
     DEFAULT_PHONE_COUNTRY_ISO2
   )
   const [phoneNumber, setPhoneNumber] = useState("")
+  const [extraPhoneCountryIso2, setExtraPhoneCountryIso2] = useState(
+    DEFAULT_PHONE_COUNTRY_ISO2
+  )
+  const [extraPhoneNumber, setExtraPhoneNumber] = useState("")
   const [provisionedNumber, setProvisionedNumber] = useState<string | null>(null)
 
   // Notification settings
@@ -87,8 +91,13 @@ export default function SettingsPage() {
       const parsedPhoneNumber = parseStoredPhoneNumber(
         restaurantData.phone_number || ""
       )
+      const parsedExtraPhoneNumber = parseStoredPhoneNumber(
+        restaurantData.extra_number || ""
+      )
       setPhoneCountryIso2(parsedPhoneNumber.country.iso2)
       setPhoneNumber(parsedPhoneNumber.localNumber)
+      setExtraPhoneCountryIso2(parsedExtraPhoneNumber.country.iso2)
+      setExtraPhoneNumber(parsedExtraPhoneNumber.localNumber)
       setProvisionedNumber(restaurantData.twilio_number || null)
       setEmailNotificationsEnabled(
         restaurantData.email_notifications_enabled ?? true
@@ -136,12 +145,24 @@ export default function SettingsPage() {
   }
 
   const handleSavePhone = async () => {
+    const businessPhone = formatPhoneNumberForStorage(phoneCountryIso2, phoneNumber)
+    const extraPhone = formatPhoneNumberForStorage(
+      extraPhoneCountryIso2,
+      extraPhoneNumber
+    )
+
+    if (!businessPhone || !extraPhone) {
+      toast.error("Bitte fÃ¼llen Sie GeschÃ¤ftsnummer und Rufnummer für Weiterleitung aus")
+      return
+    }
+
     setLoading(true)
     try {
       const { error } = await supabase
         .from("practices")
         .update({
-          phone_number: formatPhoneNumberForStorage(phoneCountryIso2, phoneNumber),
+          phone_number: businessPhone,
+          extra_number: extraPhone,
         })
         .eq("id", restaurant.id)
 
@@ -222,7 +243,7 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Restaurant-Einstellungen</CardTitle>
               <CardDescription>
-                Grundlegende Informationen über Ihr Restaurant
+                Grundlegende Informationen Ã¼ber Ihr Restaurant
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -235,7 +256,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Maximale Kapazität: {maxCapacity[0]} Personen</Label>
+                <Label>Maximale KapazitÃ¤t: {maxCapacity[0]} Personen</Label>
                 <Slider
                   value={maxCapacity}
                   onValueChange={setMaxCapacity}
@@ -246,7 +267,7 @@ export default function SettingsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="openingTime">Öffnungszeit</Label>
+                  <Label htmlFor="openingTime">Ã–ffnungszeit</Label>
                   <Input
                     id="openingTime"
                     type="time"
@@ -255,7 +276,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="closingTime">Schließzeit</Label>
+                  <Label htmlFor="closingTime">SchlieÃŸzeit</Label>
                   <Input
                     id="closingTime"
                     type="time"
@@ -303,7 +324,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Ihre Telefonnummer</Label>
+                <Label htmlFor="phoneNumber">GeschÃ¤ftsnummer *</Label>
                 <PhoneNumberField
                   id="phoneNumber"
                   countryIso2={phoneCountryIso2}
@@ -311,6 +332,33 @@ export default function SettingsPage() {
                   localNumber={phoneNumber}
                   onLocalNumberChange={setPhoneNumber}
                   placeholder="30 1234 5678"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="extraPhoneNumber">Rufnummer für Weiterleitung *</Label>
+                  <span className="group relative inline-flex">
+                    <button
+                      type="button"
+                      aria-label="Information zur weiteren Telefonnummer"
+                      className="inline-flex h-4 w-4 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                    <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-72 -translate-x-1/2 rounded-md border border-border bg-popover p-2 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                      Damit wir Ihre Kunden bei Bedarf persÃ¶nlich verbinden kÃ¶nnen, benÃ¶tigen wir eine zweite Rufnummer fÃ¼r die KI-Weiterleitung.
+                    </span>
+                  </span>
+                </div>
+                <PhoneNumberField
+                  id="extraPhoneNumber"
+                  countryIso2={extraPhoneCountryIso2}
+                  onCountryIso2Change={setExtraPhoneCountryIso2}
+                  localNumber={extraPhoneNumber}
+                  onLocalNumberChange={setExtraPhoneNumber}
+                  placeholder="30 1234 5678"
+                  required
                 />
               </div>
               <div className="rounded-lg border border-border bg-muted/10 p-4">
@@ -319,7 +367,7 @@ export default function SettingsPage() {
                     Anleitung zur Weiterleitung einer Telefonnummer
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Geben Sie die untenstehenden Tastenkombinationen auf Ihrem Gerät ein.
+                    Geben Sie die untenstehenden Tastenkombinationen auf Ihrem GerÃ¤t ein.
                   </p>
                 </div>
                 <div className="mt-4 space-y-3">
@@ -327,7 +375,7 @@ export default function SettingsPage() {
                     <p className="text-xs font-semibold text-muted-foreground">Zielnummer</p>
                     <div className="mt-1 flex items-center gap-3">
                       <p className="text-lg font-medium">
-                        {provisionedNumber ?? "Noch nicht verfügbar"}
+                        {provisionedNumber ?? "Noch nicht verfÃ¼gbar"}
                       </p>
                       <Button
                         type="button"
@@ -341,7 +389,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className="rounded-md border border-border bg-background p-3 text-sm">
-                    <div className="font-medium">Für alle Anrufe</div>
+                    <div className="font-medium">FÃ¼r alle Anrufe</div>
                     <div>{`**21*${forwardingTarget}#`}</div>
                   </div>
                   <div className="rounded-md border border-border bg-background p-3 text-sm">
@@ -358,7 +406,14 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-              <Button onClick={handleSavePhone} disabled={loading}>
+              <Button
+                onClick={handleSavePhone}
+                disabled={
+                  loading ||
+                  !formatPhoneNumberForStorage(phoneCountryIso2, phoneNumber) ||
+                  !formatPhoneNumberForStorage(extraPhoneCountryIso2, extraPhoneNumber)
+                }
+              >
                 <Save className="mr-2 h-4 w-4" />
                 Speichern
               </Button>
@@ -380,7 +435,7 @@ export default function SettingsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium">Systemmails aktivieren</p>
                   <p className="text-sm text-muted-foreground">
-                    Gilt für neue Reservierungen, 3-Tage-Hinweise und 80%-Limit-Warnung.
+                    Gilt fÃ¼r neue Reservierungen, 3-Tage-Hinweise und 80%-Limit-Warnung.
                   </p>
                 </div>
                 <Switch
@@ -440,3 +495,4 @@ export default function SettingsPage() {
     </div>
   )
 }
+

@@ -152,7 +152,7 @@ export default function SettingsPage() {
     )
 
     if (!businessPhone || !extraPhone) {
-      toast.error("Bitte fÃ¼llen Sie GeschÃ¤ftsnummer und Rufnummer für Weiterleitung aus")
+      toast.error("Bitte füllen Sie Geschäftsnummer und Rufnummer für Weiterleitung aus")
       return
     }
 
@@ -243,7 +243,7 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Restaurant-Einstellungen</CardTitle>
               <CardDescription>
-                Grundlegende Informationen Ã¼ber Ihr Restaurant
+                Grundlegende Informationen über Ihr Restaurant
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -256,7 +256,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Maximale KapazitÃ¤t: {maxCapacity[0]} Personen</Label>
+                <Label>Maximale Kapazität: {maxCapacity[0]} Personen</Label>
                 <Slider
                   value={maxCapacity}
                   onValueChange={setMaxCapacity}
@@ -267,7 +267,7 @@ export default function SettingsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="openingTime">Ã–ffnungszeit</Label>
+                  <Label htmlFor="openingTime">Öffnungszeit</Label>
                   <Input
                     id="openingTime"
                     type="time"
@@ -276,7 +276,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="closingTime">SchlieÃŸzeit</Label>
+                  <Label htmlFor="closingTime">Schließzeit</Label>
                   <Input
                     id="closingTime"
                     type="time"
@@ -324,7 +324,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="phoneNumber">GeschÃ¤ftsnummer *</Label>
+                <Label htmlFor="phoneNumber">Geschäftsnummer *</Label>
                 <PhoneNumberField
                   id="phoneNumber"
                   countryIso2={phoneCountryIso2}
@@ -347,7 +347,7 @@ export default function SettingsPage() {
                       <Info className="h-3.5 w-3.5" />
                     </button>
                     <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-72 -translate-x-1/2 rounded-md border border-border bg-popover p-2 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-                      Damit wir Ihre Kunden bei Bedarf persÃ¶nlich verbinden kÃ¶nnen, benÃ¶tigen wir eine zweite Rufnummer fÃ¼r die KI-Weiterleitung.
+                      Damit wir Ihre Kunden bei Bedarf persönlich verbinden können, benötigen wir eine zweite Rufnummer für die KI-Weiterleitung.
                     </span>
                   </span>
                 </div>
@@ -367,7 +367,7 @@ export default function SettingsPage() {
                     Anleitung zur Weiterleitung einer Telefonnummer
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Geben Sie die untenstehenden Tastenkombinationen auf Ihrem GerÃ¤t ein.
+                    Geben Sie die untenstehenden Tastenkombinationen auf Ihrem Gerät ein.
                   </p>
                 </div>
                 <div className="mt-4 space-y-3">
@@ -375,7 +375,7 @@ export default function SettingsPage() {
                     <p className="text-xs font-semibold text-muted-foreground">Zielnummer</p>
                     <div className="mt-1 flex items-center gap-3">
                       <p className="text-lg font-medium">
-                        {provisionedNumber ?? "Noch nicht verfÃ¼gbar"}
+                        {provisionedNumber ?? "Noch nicht verfügbar"}
                       </p>
                       <Button
                         type="button"
@@ -389,7 +389,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className="rounded-md border border-border bg-background p-3 text-sm">
-                    <div className="font-medium">FÃ¼r alle Anrufe</div>
+                    <div className="font-medium">Für alle Anrufe</div>
                     <div>{`**21*${forwardingTarget}#`}</div>
                   </div>
                   <div className="rounded-md border border-border bg-background p-3 text-sm">
@@ -435,7 +435,7 @@ export default function SettingsPage() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium">Systemmails aktivieren</p>
                   <p className="text-sm text-muted-foreground">
-                    Gilt fÃ¼r neue Reservierungen, 3-Tage-Hinweise und 80%-Limit-Warnung.
+                    Gilt für neue Reservierungen, 3-Tage-Hinweise und 80%-Limit-Warnung.
                   </p>
                 </div>
                 <Switch

@@ -42,7 +42,7 @@ export default function OnboardingPage() {
   const [showGuide, setShowGuide] = useState(false)
   const supabase = createClient()
 
-  // â¬‡ï¸ HIER
+  // HIER
   useEffect(() => {
     const checkExisting = async () => {
       const {
@@ -272,7 +272,7 @@ export default function OnboardingPage() {
                 <div>
                   <h2 className="text-2xl font-bold mb-2">Restaurant-Informationen</h2>
                   <p className="text-muted-foreground">
-                    Geben Sie uns einige grundlegende Informationen Ã¼ber Ihr Restaurant.
+                    Geben Sie uns einige grundlegende Informationen über Ihr Restaurant.
                   </p>
                 </div>
                 <div className="space-y-4">
@@ -298,7 +298,7 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="restaurantPhone">GeschÃ¤ftsnummer *</Label>
+                    <Label htmlFor="restaurantPhone">Geschäftsnummer *</Label>
                     <PhoneNumberField
                       id="restaurantPhone"
                       countryIso2={restaurantPhoneCountryIso2}
@@ -321,7 +321,7 @@ export default function OnboardingPage() {
                           <Info className="h-3.5 w-3.5" />
                         </button>
                         <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-72 -translate-x-1/2 rounded-md border border-border bg-popover p-2 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-                          Damit wir Ihre Kunden bei Bedarf persÃ¶nlich verbinden kÃ¶nnen, benÃ¶tigen wir eine zweite Rufnummer fÃ¼r die KI-Weiterleitung.
+                          Damit wir Ihre Kunden bei Bedarf persönlich verbinden können, benötigen wir eine zweite Rufnummer für die KI-Weiterleitung.
                         </span>
                       </span>
                     </div>
@@ -338,7 +338,7 @@ export default function OnboardingPage() {
                 </div>
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={handleBack} className="flex-1">
-                    ZurÃ¼ck
+                    Zurück
                   </Button>
                   <Button
                     onClick={handleNext}
@@ -361,15 +361,15 @@ export default function OnboardingPage() {
                 className="space-y-6"
               >
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">Ã–ffnungszeiten & KapazitÃ¤t</h2>
+                  <h2 className="text-2xl font-bold mb-2">Öffnungszeiten & Kapazität</h2>
                   <p className="text-muted-foreground">
-                    Konfigurieren Sie die Ã–ffnungszeiten und die maximale KapazitÃ¤t.
+                    Konfigurieren Sie die Öffnungszeiten und die maximale Kapazität.
                   </p>
                 </div>
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="openingTime">Ã–ffnungszeit</Label>
+                      <Label htmlFor="openingTime">Öffnungszeit</Label>
                       <Input
                         id="openingTime"
                         type="time"
@@ -378,7 +378,7 @@ export default function OnboardingPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="closingTime">SchlieÃŸzeit</Label>
+                      <Label htmlFor="closingTime">Schließzeit</Label>
                       <Input
                         id="closingTime"
                         type="time"
@@ -388,7 +388,7 @@ export default function OnboardingPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Maximale KapazitÃ¤t: {maxCapacity[0]} Personen</Label>
+                    <Label>Maximale Kapazität: {maxCapacity[0]} Personen</Label>
                     <Slider
                       value={maxCapacity}
                       onValueChange={setMaxCapacity}
@@ -420,7 +420,7 @@ export default function OnboardingPage() {
                 </div>
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={handleBack} className="flex-1">
-                    ZurÃ¼ck
+                    Zurück
                   </Button>
                   <Button onClick={handleNext} className="flex-1">
                     Weiter
@@ -441,7 +441,7 @@ export default function OnboardingPage() {
                 <div>
                   <h2 className="text-2xl font-bold mb-2">Fertig!</h2>
                   <p className="text-muted-foreground">
-                    ÃœberprÃ¼fen Sie Ihre Angaben und schlieÃŸen Sie das Onboarding ab.
+                    Überprüfen Sie Ihre Angaben und schließen Sie das Onboarding ab.
                   </p>
                 </div>
                 <Card>
@@ -459,7 +459,7 @@ export default function OnboardingPage() {
                     </div>
                     {restaurantPhone && (
                       <div>
-                        <p className="text-sm font-semibold text-muted-foreground">GeschÃ¤ftsnummer</p>
+                        <p className="text-sm font-semibold text-muted-foreground">Geschäftsnummer</p>
                         <p className="text-lg">{restaurantPhone}</p>
                       </div>
                     )}
@@ -470,13 +470,13 @@ export default function OnboardingPage() {
                       </div>
                     )}
                     <div>
-                      <p className="text-sm font-semibold text-muted-foreground">Ã–ffnungszeiten</p>
+                      <p className="text-sm font-semibold text-muted-foreground">Öffnungszeiten</p>
                       <p className="text-lg">
                         {openingTime} - {closingTime} Uhr
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-muted-foreground">Maximale KapazitÃ¤t</p>
+                      <p className="text-sm font-semibold text-muted-foreground">Maximale Kapazität</p>
                       <p className="text-lg">{maxCapacity[0]} Personen</p>
                     </div>
                     {closedDays.length > 0 && (
@@ -496,7 +496,7 @@ export default function OnboardingPage() {
                     <CardHeader>
                       <CardTitle>Anleitung zur Weiterleitung einer Telefonnummer</CardTitle>
                       <CardDescription>
-                        Geben Sie die untenstehenden Tastenkombinationen auf Ihrem GerÃ¤t ein.
+                        Geben Sie die untenstehenden Tastenkombinationen auf Ihrem Gerät ein.
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -504,7 +504,7 @@ export default function OnboardingPage() {
                         <p className="text-sm font-semibold text-muted-foreground">Zielnummer</p>
                         <div className="flex items-center gap-3">
                           <p className="text-lg font-medium">
-                            {provisionedNumber ?? "Noch nicht verfÃ¼gbar"}
+                            {provisionedNumber ?? "Noch nicht verfügbar"}
                           </p>
                           <Button
                             type="button"
@@ -518,7 +518,7 @@ export default function OnboardingPage() {
                         </div>
                       </div>
                       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
-                        <div className="font-medium">FÃ¼r alle Anrufe</div>
+                        <div className="font-medium">Für alle Anrufe</div>
                         <div>{`**21*${forwardingTarget}#`}</div>
                       </div>
                       <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">
@@ -538,19 +538,19 @@ export default function OnboardingPage() {
                 )}
                 <div className="flex gap-4">
                   <Button variant="outline" onClick={handleBack} className="flex-1">
-                    ZurÃ¼ck
+                    Zurück
                   </Button>
                   {showGuide ? (
                     <Button onClick={() => router.push("/dashboard")} className="flex-1">
-                      Dashboard oeffnen
+                      Dashboard öffnen
                     </Button>
                   ) : (
                     <Button onClick={handleFinish} className="flex-1" disabled={loading}>
                     {loading
                       ? provisioningNumber
-                        ? "ðŸ“ž Telefonnummer wird eingerichtet..."
+                        ? "📞 Telefonnummer wird eingerichtet..."
                         : "Wird gespeichert..."
-                      : "Dashboard Ã¶ffnen"}
+                      : "Dashboard öffnen"}
                   </Button>
                   )}
                 </div>

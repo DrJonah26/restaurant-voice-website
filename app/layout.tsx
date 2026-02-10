@@ -10,6 +10,11 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 export const metadata: Metadata = {
   title: "Voice AI Restaurant Assistent",
   description: "KI beantwortet Telefonate, bucht Tische, entlastet Ihr Team - 24/7",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 }
 
 

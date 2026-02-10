@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { BrandLogo } from "@/components/brand-logo"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -222,7 +223,9 @@ export default function DashboardLayout({
           <div className="flex flex-col h-full">
             {/* Logo */}
             <div className="flex items-center justify-between p-6 border-b border-sidebar-border">
-              <h1 className="text-xl font-bold text-sidebar-foreground">JoydeAI</h1>
+              <Link href="/" className="inline-flex items-center">
+                <BrandLogo size="md" textClassName="text-sidebar-foreground" />
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"
@@ -325,7 +328,7 @@ export default function DashboardLayout({
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <h1 className="text-lg font-semibold">JoydeAI</h1>
+            <BrandLogo size="sm" />
             <div className="w-10" />
           </div>
         </header>

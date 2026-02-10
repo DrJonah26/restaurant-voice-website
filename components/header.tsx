@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
+import { BrandLogo } from "@/components/brand-logo"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -13,11 +13,8 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <nav className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="relative h-8 w-8 overflow-hidden rounded-lg">
-              <Image src="/logo.png" alt="JoydeAI Logo" fill priority className="object-contain" />
-            </div>
-            <span className="text-xl font-semibold text-foreground">JoydeAI</span>
+          <Link href="/" className="inline-flex items-center">
+            <BrandLogo size="md" />
           </Link>
 
           <div className="hidden md:flex items-center gap-8">

@@ -111,7 +111,7 @@ export function PhoneNumberField({
           placeholder={placeholder}
           required={required}
           disabled={disabled}
-          className="rounded-l-none border-l-0"
+          className="rounded-l-none border-l-0 text-sm tabular-nums"
         />
       </div>
 

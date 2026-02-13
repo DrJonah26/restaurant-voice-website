@@ -1,6 +1,6 @@
 ﻿import Link from "next/link"
-import { Phone } from "lucide-react"
 import { CONTACT_ROUTE } from "@/lib/contact"
+import { BrandLogo } from "@/components/brand-logo"
 
 type FooterLink = {
   label: string
@@ -36,11 +36,8 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <Phone className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-semibold text-foreground">JoydeAI</span>
+            <Link href="/" className="inline-flex items-center mb-4">
+              <BrandLogo size="md" />
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Die intelligente Lösung für Restaurant-Telefonie.

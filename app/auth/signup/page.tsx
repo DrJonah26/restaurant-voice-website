@@ -35,6 +35,7 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
+    const normalizedEmail = email.trim().toLowerCase()
 
     if (password !== confirmPassword) {
       toast.error("Passwörter stimmen nicht überein")
@@ -49,15 +50,34 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
+      const { data, error } = await supabase.auth.signUp({
+        email: normalizedEmail,
         password,
         options: {
           emailRedirectTo: `${siteUrl}/auth/callback`,
         },
       })
 
-      if (error) throw error
+      if (error) {
+        const errorMessage = error.message?.toLowerCase() ?? ""
+        const isAlreadyRegisteredError =
+          errorMessage.includes("user already registered") || errorMessage.includes("already exists")
+
+        if (isAlreadyRegisteredError) {
+          toast.error(`Auf dieser E-Mail (${normalizedEmail}) besteht bereits ein Konto.`)
+          return
+        }
+
+        throw error
+      }
+
+      const isAlreadyRegisteredByObfuscation =
+        data.user?.identities !== undefined && data.user.identities.length === 0
+
+      if (isAlreadyRegisteredByObfuscation) {
+        toast.error(`Auf dieser E-Mail (${normalizedEmail}) besteht bereits ein Konto.`)
+        return
+      }
 
       toast.success("Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail.")
       //router.push("/onboarding")

@@ -18,16 +18,16 @@ export function Header() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+            <Link href="/#features" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Features
             </Link>
-            <Link href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+            <Link href="/#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               So funktioniert's
             </Link>
-            <Link href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+            <Link href="/#pricing" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Preise
             </Link>
-            <Link href="#demo" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+            <Link href="/#demo" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Demo
             </Link>
           </div>
@@ -58,16 +58,16 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border mt-4">
             <div className="flex flex-col gap-4">
-              <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/#features" className="text-muted-foreground hover:text-foreground transition-colors">
                 Features
               </Link>
-              <Link href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
                 So funktioniert's
               </Link>
-              <Link href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
                 Preise
               </Link>
-              <Link href="#demo" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/#demo" className="text-muted-foreground hover:text-foreground transition-colors">
                 Demo
               </Link>
               <div className="flex flex-col gap-2 pt-4 border-t border-border">

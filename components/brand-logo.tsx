@@ -9,11 +9,11 @@ type BrandLogoProps = {
 
 const sizeClasses = {
   sm: {
-    wrapper: "h-5 w-5",
+    wrapper: "h-[1rem] w-[1rem]",
     text: "text-base",
   },
   md: {
-    wrapper: "h-6 w-6",
+    wrapper: "h-[1.35rem] w-[1.35rem]",
     text: "text-[1.35rem]",
   },
 }
@@ -26,19 +26,19 @@ export function BrandLogo({
   const selectedSize = sizeClasses[size]
 
   return (
-    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap align-middle", className)}>
+    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap align-middle leading-none", className)}>
       <span className={cn("relative shrink-0 overflow-hidden", selectedSize.wrapper)}>
         <Image
           src="/logo.png"
           alt="JoydeAI Logo"
           fill
           priority
-          className="scale-[1.28] object-contain object-center"
+          className="scale-[1.32] object-contain object-center"
         />
       </span>
       <span
         className={cn(
-          "translate-y-[0.5px] font-semibold leading-none text-foreground tracking-[-0.01em]",
+          "font-semibold leading-none text-foreground tracking-[-0.01em]",
           selectedSize.text,
           textClassName
         )}

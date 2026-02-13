@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
+import { evaluatePasswordStrength } from "@/lib/password-strength"
 import { toast } from "sonner"
 
 const siteUrl =
@@ -20,18 +21,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
-
-  const getPasswordStrength = (password: string) => {
-    if (password.length === 0) return { strength: 0, label: "" }
-    if (password.length < 6) return { strength: 1, label: "Schwach" }
-    if (password.length < 10) return { strength: 2, label: "Mittel" }
-    if (/[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password)) {
-      return { strength: 4, label: "Sehr stark" }
-    }
-    return { strength: 3, label: "Stark" }
-  }
-
-  const passwordStrength = getPasswordStrength(password)
+  const passwordStrength = evaluatePasswordStrength(password, { email })
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,8 +32,9 @@ export default function SignupPage() {
       return
     }
 
-    if (password.length < 6) {
-      toast.error("Passwort muss mindestens 6 Zeichen lang sein")
+    const passwordCheck = evaluatePasswordStrength(password, { email: normalizedEmail })
+    if (!passwordCheck.isStrong) {
+      toast.error(passwordCheck.feedback[0] ?? "Bitte ein starkes Passwort verwenden")
       return
     }
 
@@ -166,6 +157,11 @@ export default function SignupPage() {
                     <p className="text-xs text-muted-foreground">
                       Passwort-Stärke: {passwordStrength.label}
                     </p>
+                    {!passwordStrength.isStrong && passwordStrength.feedback.length > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        {passwordStrength.feedback[0]}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -182,7 +178,11 @@ export default function SignupPage() {
                   className="bg-background/50 border-border/50"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || !passwordStrength.isStrong}
+              >
                 {loading ? "Wird registriert..." : "Registrieren"}
               </Button>
             </form>

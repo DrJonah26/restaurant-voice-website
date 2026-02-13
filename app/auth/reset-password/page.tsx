@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { createClient } from "@/lib/supabase/client"
+import { evaluatePasswordStrength } from "@/lib/password-strength"
 import { toast } from "sonner"
 
 export default function ResetPasswordPage() {
@@ -18,6 +19,7 @@ export default function ResetPasswordPage() {
   const [checking, setChecking] = useState(true)
   const [hasSession, setHasSession] = useState(false)
   const supabase = createClient()
+  const passwordStrength = evaluatePasswordStrength(password)
 
   useEffect(() => {
     let mounted = true
@@ -52,8 +54,9 @@ export default function ResetPasswordPage() {
       return
     }
 
-    if (password.length < 6) {
-      toast.error("Passwort muss mindestens 6 Zeichen lang sein")
+    const passwordCheck = evaluatePasswordStrength(password)
+    if (!passwordCheck.isStrong) {
+      toast.error(passwordCheck.feedback[0] ?? "Bitte ein starkes Passwort verwenden")
       return
     }
 
@@ -120,6 +123,34 @@ export default function ResetPasswordPage() {
                       disabled={loading || checking}
                       className="bg-background/50 border-border/50"
                     />
+                    {password && (
+                      <div className="space-y-1">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4].map((level) => (
+                            <div
+                              key={level}
+                              className={`h-1 flex-1 rounded transition-all ${
+                                level <= passwordStrength.strength
+                                  ? level <= 2
+                                    ? "bg-red-500"
+                                    : level === 3
+                                    ? "bg-yellow-500"
+                                    : "bg-green-500"
+                                  : "bg-muted"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Passwort-Stärke: {passwordStrength.label}
+                        </p>
+                        {!passwordStrength.isStrong && passwordStrength.feedback.length > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            {passwordStrength.feedback[0]}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
@@ -134,7 +165,11 @@ export default function ResetPasswordPage() {
                       className="bg-background/50 border-border/50"
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={loading || checking}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={loading || checking || !passwordStrength.isStrong}
+                  >
                     {loading ? "Wird gespeichert..." : "Passwort speichern"}
                   </Button>
                 </form>

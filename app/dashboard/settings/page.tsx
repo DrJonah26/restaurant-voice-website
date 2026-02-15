@@ -10,25 +10,24 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Checkbox } from "@/components/ui/checkbox"
+import { OpeningHoursEditor } from "@/components/opening-hours-editor"
 import { PhoneNumberField } from "@/components/phone-number-field"
 import { toast } from "sonner"
 import { Info, Save } from "lucide-react"
+import {
+  defaultOpeningHours,
+  deriveLegacyFields,
+  fromDbOpeningHours,
+  formatOpeningHoursSummary,
+  hasAnyOpenDay,
+  toDbOpeningHours,
+  type OpeningHours,
+} from "@/lib/opening-hours"
 import {
   DEFAULT_PHONE_COUNTRY_ISO2,
   formatPhoneNumberForStorage,
   parseStoredPhoneNumber,
 } from "@/lib/phone-countries"
-
-const DAYS = [
-  { value: "monday", label: "Montag" },
-  { value: "tuesday", label: "Dienstag" },
-  { value: "wednesday", label: "Mittwoch" },
-  { value: "thursday", label: "Donnerstag" },
-  { value: "friday", label: "Freitag" },
-  { value: "saturday", label: "Samstag" },
-  { value: "sunday", label: "Sonntag" },
-]
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -39,9 +38,9 @@ export default function SettingsPage() {
   // Restaurant settings
   const [restaurantName, setRestaurantName] = useState("")
   const [maxCapacity, setMaxCapacity] = useState([50])
-  const [openingTime, setOpeningTime] = useState("09:00")
-  const [closingTime, setClosingTime] = useState("22:00")
-  const [closedDays, setClosedDays] = useState<string[]>([])
+  const [openingHours, setOpeningHours] = useState<OpeningHours>(
+    defaultOpeningHours()
+  )
 
   // Phone settings
   const [phoneCountryIso2, setPhoneCountryIso2] = useState(
@@ -85,9 +84,13 @@ export default function SettingsPage() {
       setRestaurant(restaurantData)
       setRestaurantName(restaurantData.name || "")
       setMaxCapacity([restaurantData.max_capacity || 50])
-      setOpeningTime(restaurantData.opening_time || "09:00")
-      setClosingTime(restaurantData.closing_time || "22:00")
-      setClosedDays(restaurantData.closed_days || [])
+      setOpeningHours(
+        fromDbOpeningHours(restaurantData.opening_hours, {
+          opening_time: restaurantData.opening_time,
+          closing_time: restaurantData.closing_time,
+          closed_days: restaurantData.closed_days,
+        })
+      )
       const parsedPhoneNumber = parseStoredPhoneNumber(
         restaurantData.phone_number || ""
       )
@@ -114,23 +117,19 @@ export default function SettingsPage() {
     loadData()
   }, [router, supabase])
 
-  const handleDayToggle = (day: string) => {
-    setClosedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    )
-  }
-
   const handleSaveRestaurant = async () => {
     setLoading(true)
     try {
+      const legacyHours = deriveLegacyFields(openingHours)
       const { error } = await supabase
         .from("practices")
         .update({
           name: restaurantName,
           max_capacity: maxCapacity[0],
-          opening_time: openingTime,
-          closing_time: closingTime,
-          closed_days: closedDays,
+          opening_hours: toDbOpeningHours(openingHours),
+          opening_time: legacyHours.opening_time,
+          closing_time: legacyHours.closing_time,
+          closed_days: legacyHours.closed_days,
         })
         .eq("id", restaurant.id)
 
@@ -265,45 +264,20 @@ export default function SettingsPage() {
                   step={5}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="openingTime">Öffnungszeit</Label>
-                  <Input
-                    id="openingTime"
-                    type="time"
-                    value={openingTime}
-                    onChange={(e) => setOpeningTime(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="closingTime">Schließzeit</Label>
-                  <Input
-                    id="closingTime"
-                    type="time"
-                    value={closingTime}
-                    onChange={(e) => setClosingTime(e.target.value)}
-                  />
-                </div>
-              </div>
               <div className="space-y-2">
-                <Label>Geschlossene Tage</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {DAYS.map((day) => (
-                    <div key={day.value} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={day.value}
-                        checked={closedDays.includes(day.value)}
-                        onCheckedChange={() => handleDayToggle(day.value)}
-                      />
-                      <Label
-                        htmlFor={day.value}
-                        className="text-sm font-normal cursor-pointer"
-                      >
-                        {day.label}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
+                <Label>Öffnungszeiten pro Tag</Label>
+                <OpeningHoursEditor
+                  value={openingHours}
+                  onChange={setOpeningHours}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Zusammenfassung: {formatOpeningHoursSummary(openingHours)}
+                </p>
+                {!hasAnyOpenDay(openingHours) && (
+                  <p className="text-xs text-amber-600">
+                    Aktuell sind alle Tage als geschlossen markiert.
+                  </p>
+                )}
               </div>
               <Button onClick={handleSaveRestaurant} disabled={loading}>
                 <Save className="mr-2 h-4 w-4" />

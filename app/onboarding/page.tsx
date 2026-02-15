@@ -8,9 +8,17 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Slider } from "@/components/ui/slider"
-import { Checkbox } from "@/components/ui/checkbox"
+import { OpeningHoursEditor } from "@/components/opening-hours-editor"
 import { PhoneNumberField } from "@/components/phone-number-field"
 import { createClient } from "@/lib/supabase/client"
+import {
+  defaultOpeningHours,
+  deriveLegacyFields,
+  formatOpeningHoursSummary,
+  hasAnyOpenDay,
+  toDbOpeningHours,
+  type OpeningHours,
+} from "@/lib/opening-hours"
 import { TRIAL_CALLS_LIMIT, TRIAL_DURATION_DAYS } from "@/lib/stripe-plans"
 import {
   DEFAULT_PHONE_COUNTRY_ISO2,
@@ -20,18 +28,7 @@ import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
 import { useEffect } from "react"
 import confetti from "canvas-confetti"
-import type { CreateTypes } from "canvas-confetti"
 import { Info } from "lucide-react"
-
-const DAYS = [
-  { value: "monday", label: "Montag" },
-  { value: "tuesday", label: "Dienstag" },
-  { value: "wednesday", label: "Mittwoch" },
-  { value: "thursday", label: "Donnerstag" },
-  { value: "friday", label: "Freitag" },
-  { value: "saturday", label: "Samstag" },
-  { value: "sunday", label: "Sonntag" },
-]
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -80,10 +77,10 @@ export default function OnboardingPage() {
   const [extraPhoneLocal, setExtraPhoneLocal] = useState("")
 
   // Step 3: Hours & Capacity
-  const [openingTime, setOpeningTime] = useState("09:00")
-  const [closingTime, setClosingTime] = useState("22:00")
+  const [openingHours, setOpeningHours] = useState<OpeningHours>(
+    defaultOpeningHours()
+  )
   const [maxCapacity, setMaxCapacity] = useState([50])
-  const [closedDays, setClosedDays] = useState<string[]>([])
 
   const totalSteps = 4
   const progress = (step / totalSteps) * 100
@@ -94,6 +91,12 @@ export default function OnboardingPage() {
     formatPhoneNumberForStorage(extraPhoneCountryIso2, extraPhoneLocal) ?? ""
 
   const handleNext = () => {
+    if (step === 3 && !hasAnyOpenDay(openingHours)) {
+      toast.warning(
+        "Aktuell sind alle Tage als geschlossen markiert. Speichern ist trotzdem möglich."
+      )
+    }
+
     if (step < totalSteps) {
       setStep(step + 1)
     }
@@ -103,12 +106,6 @@ export default function OnboardingPage() {
     if (step > 1) {
       setStep(step - 1)
     }
-  }
-
-  const handleDayToggle = (day: string) => {
-    setClosedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    )
   }
 
   const handleFinish = async () => {
@@ -121,6 +118,7 @@ export default function OnboardingPage() {
       if (!user) {
         throw new Error("Nicht angemeldet")
       }
+      const legacyHours = deriveLegacyFields(openingHours)
 
       // Save restaurant data to Supabase
       const { data, error } = await supabase
@@ -132,10 +130,11 @@ export default function OnboardingPage() {
             email: restaurantEmail,
             phone_number: restaurantPhone || null,
             extra_number: extraPhone || null,
-            opening_time: openingTime,
-            closing_time: closingTime,
+            opening_hours: toDbOpeningHours(openingHours),
+            opening_time: legacyHours.opening_time,
+            closing_time: legacyHours.closing_time,
             max_capacity: maxCapacity[0],
-            closed_days: closedDays,
+            closed_days: legacyHours.closed_days,
             onboarding_completed: false,
           },
           { onConflict: "user_id" }
@@ -367,25 +366,12 @@ export default function OnboardingPage() {
                   </p>
                 </div>
                 <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="openingTime">Öffnungszeit</Label>
-                      <Input
-                        id="openingTime"
-                        type="time"
-                        value={openingTime}
-                        onChange={(e) => setOpeningTime(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="closingTime">Schließzeit</Label>
-                      <Input
-                        id="closingTime"
-                        type="time"
-                        value={closingTime}
-                        onChange={(e) => setClosingTime(e.target.value)}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Label>Öffnungszeiten pro Tag</Label>
+                    <OpeningHoursEditor
+                      value={openingHours}
+                      onChange={setOpeningHours}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Maximale Kapazität: {maxCapacity[0]} Personen</Label>
@@ -396,26 +382,6 @@ export default function OnboardingPage() {
                       max={200}
                       step={5}
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Geschlossene Tage</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {DAYS.map((day) => (
-                        <div key={day.value} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={day.value}
-                            checked={closedDays.includes(day.value)}
-                            onCheckedChange={() => handleDayToggle(day.value)}
-                          />
-                          <Label
-                            htmlFor={day.value}
-                            className="text-sm font-normal cursor-pointer"
-                          >
-                            {day.label}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -472,20 +438,21 @@ export default function OnboardingPage() {
                     <div>
                       <p className="text-sm font-semibold text-muted-foreground">Öffnungszeiten</p>
                       <p className="text-lg">
-                        {openingTime} - {closingTime} Uhr
+                        {formatOpeningHoursSummary(openingHours)}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-muted-foreground">Maximale Kapazität</p>
                       <p className="text-lg">{maxCapacity[0]} Personen</p>
                     </div>
-                    {closedDays.length > 0 && (
+                    {!hasAnyOpenDay(openingHours) && (
                       <div>
-                        <p className="text-sm font-semibold text-muted-foreground">Geschlossene Tage</p>
-                        <p className="text-lg">
-                          {closedDays
-                            .map((d) => DAYS.find((day) => day.value === d)?.label)
-                            .join(", ")}
+                        <p className="text-sm font-semibold text-amber-600">
+                          Hinweis zu Öffnungszeiten
+                        </p>
+                        <p className="text-sm text-amber-600">
+                          Alle Tage sind aktuell geschlossen markiert. Sie können
+                          trotzdem speichern.
                         </p>
                       </div>
                     )}

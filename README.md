@@ -73,6 +73,15 @@ CREATE TABLE restaurants (
   email TEXT NOT NULL,
   phone TEXT,
   type TEXT DEFAULT 'restaurant',
+  opening_hours JSONB NOT NULL DEFAULT '{
+    "monday": {"is_open": true, "open_time": "09:00", "close_time": "22:00"},
+    "tuesday": {"is_open": true, "open_time": "09:00", "close_time": "22:00"},
+    "wednesday": {"is_open": true, "open_time": "09:00", "close_time": "22:00"},
+    "thursday": {"is_open": true, "open_time": "09:00", "close_time": "22:00"},
+    "friday": {"is_open": true, "open_time": "09:00", "close_time": "22:00"},
+    "saturday": {"is_open": true, "open_time": "09:00", "close_time": "22:00"},
+    "sunday": {"is_open": true, "open_time": "09:00", "close_time": "22:00"}
+  }'::jsonb,
   opening_time TIME DEFAULT '09:00',
   closing_time TIME DEFAULT '22:00',
   max_capacity INTEGER DEFAULT 50,
@@ -150,6 +159,7 @@ CREATE POLICY "Users can update own reservations"
     )
   );
 ```
+Hinweis: `opening_time`, `closing_time` und `closed_days` bleiben aus Kompatibilitätsgründen erhalten und werden weiterhin synchron zu `opening_hours` gepflegt.
 
 4. **Stripe Setup:**
 - Erstellen Sie Produkte und Preise in Stripe Dashboard

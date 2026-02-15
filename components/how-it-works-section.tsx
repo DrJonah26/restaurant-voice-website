@@ -11,13 +11,13 @@ const steps = [
   {
     number: "01",
     title: "Nummer verbinden",
-    description: "Leiten Sie Ihre bestehende Telefonnummer um oder erhalten Sie in Minuten eine neue Nummer.",
+    description: "Leiten Sie Ihre bestehende Telefonnummer um.",
     icon: Phone,
   },
   {
     number: "02",
     title: "KI konfigurieren",
-    description: "Öffnungszeiten, Speisekarte, Sonderwünsche und Gesprächsstil individuell festlegen.",
+    description: "Öffnungszeiten, Benachrichtigungen, etc. individuell festlegen.",
     icon: Settings,
   },
   {

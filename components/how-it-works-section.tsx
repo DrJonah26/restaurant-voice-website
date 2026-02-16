@@ -17,7 +17,7 @@ const steps = [
   {
     number: "02",
     title: "KI konfigurieren",
-    description: "Öffnungszeiten, Benachrichtigungen, etc. individuell festlegen.",
+    description: "Öffnungszeiten und Benachrichtigungen individuell festlegen.",
     icon: Settings,
   },
   {

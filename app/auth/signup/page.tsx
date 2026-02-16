@@ -10,9 +10,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { createClient } from "@/lib/supabase/client"
 import { evaluatePasswordStrength } from "@/lib/password-strength"
 import { toast } from "sonner"
+import { GoogleAuthButton } from "@/components/google-auth-button"
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+const getSiteUrl = () => {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
+  if (typeof window !== "undefined") return window.location.origin
+  return ""
+}
 
 export default function SignupPage() {
   const router = useRouter()
@@ -45,7 +49,7 @@ export default function SignupPage() {
         email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${siteUrl}/auth/callback`,
+          emailRedirectTo: `${getSiteUrl()}/auth/callback`,
         },
       })
 
@@ -75,6 +79,24 @@ export default function SignupPage() {
     } catch (error: any) {
       toast.error(error.message || "Fehler bei der Registrierung")
     } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleSignup = async () => {
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${getSiteUrl()}/auth/callback`,
+        },
+      })
+
+      if (error) throw error
+    } catch (error: any) {
+      toast.error(error.message || "Fehler bei der Google-Registrierung")
       setLoading(false)
     }
   }
@@ -110,6 +132,17 @@ export default function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="space-y-4 mb-4">
+              <GoogleAuthButton label="Sign up with Google" onClick={handleGoogleSignup} disabled={loading} />
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">oder</span>
+                </div>
+              </div>
+            </div>
             <form onSubmit={handleSignup} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">E-Mail</Label>

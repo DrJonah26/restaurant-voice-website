@@ -10,6 +10,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Eye, EyeOff } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
+import { GoogleAuthButton } from "@/components/google-auth-button"
+
+const getSiteUrl = () => {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
+  if (typeof window !== "undefined") return window.location.origin
+  return ""
+}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -36,6 +43,24 @@ export default function LoginPage() {
     } catch (error: any) {
       toast.error(error.message || "Fehler beim Anmelden")
     } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${getSiteUrl()}/auth/callback`,
+        },
+      })
+
+      if (error) throw error
+    } catch (error: any) {
+      toast.error(error.message || "Fehler bei der Google-Anmeldung")
       setLoading(false)
     }
   }
@@ -71,6 +96,17 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="space-y-4 mb-4">
+              <GoogleAuthButton label="Sign in with Google" onClick={handleGoogleLogin} disabled={loading} />
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">oder</span>
+                </div>
+              </div>
+            </div>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">E-Mail</Label>

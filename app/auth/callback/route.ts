@@ -11,12 +11,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", request.url))
   }
 
-  const supabase = createServerClient()
-  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  try {
+    const supabase = await createServerClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-  if (error) {
+    if (error) {
+      return NextResponse.redirect(new URL("/auth/login", request.url))
+    }
+
+    return NextResponse.redirect(new URL(redirectPath, request.url))
+  } catch (error) {
+    console.error("Auth callback error:", error)
     return NextResponse.redirect(new URL("/auth/login", request.url))
   }
-
-  return NextResponse.redirect(new URL(redirectPath, request.url))
 }

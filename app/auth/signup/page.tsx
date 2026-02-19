@@ -12,22 +12,48 @@ import { evaluatePasswordStrength } from "@/lib/password-strength"
 import { toast } from "sonner"
 import { GoogleAuthButton } from "@/components/google-auth-button"
 
-const normalizeSiteUrl = (url: string) => url.replace(/\/+$/, "")
+const normalizeSiteUrl = (url: string) => url.trim().replace(/\/+$/, "")
+
+const getConfiguredSiteUrls = () => {
+  const rawUrls = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.NEXT_PUBLIC_APP_URL,
+    ...(process.env.NEXT_PUBLIC_SITE_URLS?.split(",") ?? []),
+  ]
+
+  return rawUrls
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value))
+    .map((value) => normalizeSiteUrl(value))
+}
+
+const getHost = (url: string) => {
+  try {
+    return new URL(url).host
+  } catch {
+    return ""
+  }
+}
 
 const getSiteUrl = () => {
+  const configuredUrls = getConfiguredSiteUrls()
+
   if (typeof window !== "undefined" && window.location.origin) {
-    return normalizeSiteUrl(window.location.origin)
+    const currentOrigin = normalizeSiteUrl(window.location.origin)
+    const currentHost = getHost(currentOrigin)
+
+    if (currentHost) {
+      const matchingConfiguredUrl = configuredUrls.find(
+        (configuredUrl) => getHost(configuredUrl) === currentHost
+      )
+
+      if (matchingConfiguredUrl) return matchingConfiguredUrl
+    }
+
+    return currentOrigin
   }
 
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL)
-  }
-
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return normalizeSiteUrl(process.env.NEXT_PUBLIC_APP_URL)
-  }
-
-  return ""
+  return configuredUrls[0] ?? ""
 }
 
 export default function SignupPage() {

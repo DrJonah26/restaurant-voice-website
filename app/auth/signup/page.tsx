@@ -12,48 +12,10 @@ import { evaluatePasswordStrength } from "@/lib/password-strength"
 import { toast } from "sonner"
 import { GoogleAuthButton } from "@/components/google-auth-button"
 
-const normalizeSiteUrl = (url: string) => url.trim().replace(/\/+$/, "")
-
-const getConfiguredSiteUrls = () => {
-  const rawUrls = [
-    process.env.NEXT_PUBLIC_SITE_URL,
-    process.env.NEXT_PUBLIC_APP_URL,
-    ...(process.env.NEXT_PUBLIC_SITE_URLS?.split(",") ?? []),
-  ]
-
-  return rawUrls
-    .map((value) => value?.trim())
-    .filter((value): value is string => Boolean(value))
-    .map((value) => normalizeSiteUrl(value))
-}
-
-const getHost = (url: string) => {
-  try {
-    return new URL(url).host
-  } catch {
-    return ""
-  }
-}
-
 const getSiteUrl = () => {
-  const configuredUrls = getConfiguredSiteUrls()
-
-  if (typeof window !== "undefined" && window.location.origin) {
-    const currentOrigin = normalizeSiteUrl(window.location.origin)
-    const currentHost = getHost(currentOrigin)
-
-    if (currentHost) {
-      const matchingConfiguredUrl = configuredUrls.find(
-        (configuredUrl) => getHost(configuredUrl) === currentHost
-      )
-
-      if (matchingConfiguredUrl) return matchingConfiguredUrl
-    }
-
-    return currentOrigin
-  }
-
-  return configuredUrls[0] ?? ""
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
+  if (typeof window !== "undefined") return window.location.origin
+  return ""
 }
 
 export default function SignupPage() {
@@ -102,7 +64,7 @@ export default function SignupPage() {
         email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/onboarding")}`,
+          emailRedirectTo: `${getSiteUrl()}/auth/callback`,
         },
       })
 
@@ -145,7 +107,7 @@ export default function SignupPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/onboarding")}`,
+          redirectTo: `${getSiteUrl()}/auth/callback`,
           queryParams: {
             prompt: "select_account",
           },

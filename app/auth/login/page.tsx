@@ -12,9 +12,21 @@ import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { GoogleAuthButton } from "@/components/google-auth-button"
 
+const normalizeSiteUrl = (url: string) => url.replace(/\/+$/, "")
+
 const getSiteUrl = () => {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
-  if (typeof window !== "undefined") return window.location.origin
+  if (typeof window !== "undefined" && window.location.origin) {
+    return normalizeSiteUrl(window.location.origin)
+  }
+
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL)
+  }
+
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return normalizeSiteUrl(process.env.NEXT_PUBLIC_APP_URL)
+  }
+
   return ""
 }
 
@@ -54,7 +66,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${getSiteUrl()}/auth/callback`,
+          redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/dashboard")}`,
         },
       })
 

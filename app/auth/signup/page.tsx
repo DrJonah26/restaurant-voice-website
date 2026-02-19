@@ -12,9 +12,21 @@ import { evaluatePasswordStrength } from "@/lib/password-strength"
 import { toast } from "sonner"
 import { GoogleAuthButton } from "@/components/google-auth-button"
 
+const normalizeSiteUrl = (url: string) => url.replace(/\/+$/, "")
+
 const getSiteUrl = () => {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
-  if (typeof window !== "undefined") return window.location.origin
+  if (typeof window !== "undefined" && window.location.origin) {
+    return normalizeSiteUrl(window.location.origin)
+  }
+
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL)
+  }
+
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return normalizeSiteUrl(process.env.NEXT_PUBLIC_APP_URL)
+  }
+
   return ""
 }
 
@@ -26,6 +38,19 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const passwordStrength = evaluatePasswordStrength(password, { email })
+
+  const ensureFreshAuthSession = async () => {
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession()
+
+    if (sessionError) throw sessionError
+    if (!session) return
+
+    const { error: signOutError } = await supabase.auth.signOut({ scope: "local" })
+    if (signOutError) throw signOutError
+  }
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,11 +70,13 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
+      await ensureFreshAuthSession()
+
       const { data, error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${getSiteUrl()}/auth/callback`,
+          emailRedirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/onboarding")}`,
         },
       })
 
@@ -87,10 +114,15 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
+      await ensureFreshAuthSession()
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${getSiteUrl()}/auth/callback`,
+          redirectTo: `${getSiteUrl()}/auth/callback?next=${encodeURIComponent("/onboarding")}`,
+          queryParams: {
+            prompt: "select_account",
+          },
         },
       })
 

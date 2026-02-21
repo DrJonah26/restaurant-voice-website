@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -21,6 +22,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { Plus, Search, MoreVertical, Phone, X, Eye } from "lucide-react"
 import { formatDate, formatTime } from "@/lib/utils"
 import { toast } from "sonner"
@@ -38,6 +47,19 @@ export default function ReservationsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [isHydrated, setIsHydrated] = useState(false)
   const supabase = createClient()
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [newReservation, setNewReservation] = useState({
+    customer_name: "",
+    phone_number: "",
+    date: "",
+    time: "",
+    party_size: "",
+    notes: "",
+    status: "confirmed",
+  })
 
   useEffect(() => {
     setIsHydrated(true)
@@ -156,7 +178,7 @@ export default function ReservationsPage() {
       if (error) throw error
 
       toast.success("Reservierung abgesagt")
-      
+
       // Refresh data
       const { data: reservationsData } = await supabase
         .from("reservations")
@@ -168,6 +190,55 @@ export default function ReservationsPage() {
       setReservations(reservationsData || [])
     } catch (error: any) {
       toast.error(error.message || "Fehler beim Absagen")
+    }
+  }
+
+  const handleCreateReservation = async () => {
+    if (!newReservation.customer_name || !newReservation.date || !newReservation.time || !newReservation.party_size) {
+      toast.error("Bitte füllen Sie alle Pflichtfelder aus")
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const { error } = await supabase.from("reservations").insert({
+        practice_id: restaurant.id,
+        customer_name: newReservation.customer_name,
+        phone_number: newReservation.phone_number || null,
+        date: newReservation.date,
+        time: newReservation.time + ":00",
+        party_size: parseInt(newReservation.party_size),
+        notes: newReservation.notes || null,
+        status: newReservation.status,
+      })
+
+      if (error) throw error
+
+      toast.success("Reservierung erfolgreich erstellt")
+      setIsModalOpen(false)
+      setNewReservation({
+        customer_name: "",
+        phone_number: "",
+        date: "",
+        time: "",
+        party_size: "",
+        notes: "",
+        status: "confirmed",
+      })
+
+      // Refresh data
+      const { data: reservationsData } = await supabase
+        .from("reservations")
+        .select("*")
+        .eq("practice_id", restaurant.id)
+        .order("date", { ascending: false })
+        .order("time", { ascending: false })
+
+      setReservations(reservationsData || [])
+    } catch (error: any) {
+      toast.error(error.message || "Fehler beim Erstellen der Reservierung")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -186,11 +257,130 @@ export default function ReservationsPage() {
             Verwalten Sie alle Ihre Tischreservierungen
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Neue Reservierung
         </Button>
       </div>
+
+      {/* Modal: Neue Reservierung */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Neue Reservierung</DialogTitle>
+            <DialogDescription>
+              Füllen Sie die Daten für die neue Reservierung aus. Pflichtfelder sind mit * markiert.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="customer_name">Name *</Label>
+              <Input
+                id="customer_name"
+                placeholder="Vor- und Nachname"
+                value={newReservation.customer_name}
+                onChange={(e) =>
+                  setNewReservation((prev) => ({ ...prev, customer_name: e.target.value }))
+                }
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="phone_number">Telefonnummer</Label>
+              <Input
+                id="phone_number"
+                placeholder="+49 123 456789"
+                value={newReservation.phone_number}
+                onChange={(e) =>
+                  setNewReservation((prev) => ({ ...prev, phone_number: e.target.value }))
+                }
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="date">Datum *</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={newReservation.date}
+                  onChange={(e) =>
+                    setNewReservation((prev) => ({ ...prev, date: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="time">Uhrzeit *</Label>
+                <Input
+                  id="time"
+                  type="time"
+                  value={newReservation.time}
+                  onChange={(e) =>
+                    setNewReservation((prev) => ({ ...prev, time: e.target.value }))
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="party_size">Anzahl Personen *</Label>
+              <Input
+                id="party_size"
+                type="number"
+                min="1"
+                max="50"
+                placeholder="2"
+                value={newReservation.party_size}
+                onChange={(e) =>
+                  setNewReservation((prev) => ({ ...prev, party_size: e.target.value }))
+                }
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={newReservation.status}
+                onValueChange={(v) =>
+                  setNewReservation((prev) => ({ ...prev, status: v }))
+                }
+              >
+                <SelectTrigger id="status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="confirmed">Bestätigt</SelectItem>
+                  <SelectItem value="cancelled">Abgesagt</SelectItem>
+                  <SelectItem value="completed">Abgeschlossen</SelectItem>
+                  <SelectItem value="no_show">Nicht erschienen</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="notes">Anmerkungen</Label>
+              <Input
+                id="notes"
+                placeholder="Geburtstag, Allergie, Sonderwunsch..."
+                value={newReservation.notes}
+                onChange={(e) =>
+                  setNewReservation((prev) => ({ ...prev, notes: e.target.value }))
+                }
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>
+              Abbrechen
+            </Button>
+            <Button onClick={handleCreateReservation} disabled={isSubmitting}>
+              {isSubmitting ? "Wird gespeichert..." : "Reservierung erstellen"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Filters */}
       <Card>
